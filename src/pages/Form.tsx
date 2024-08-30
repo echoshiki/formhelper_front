@@ -7,7 +7,6 @@ import { PaginationInfo, PaginationSimple } from "@/components/Pagination";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 import {
@@ -18,20 +17,11 @@ import {
 } from "@/components/ui/tooltip"
 import { Spinner } from "@/components/package/Spinner";
 import { toast } from "@/components/ui/use-toast";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 import { ChevronsUpDown, CirclePlus, PencilRuler, Search, Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import { SearchBar } from "@/components/SearchBar";
+import { IsSure } from "@/components/package/IsSure";
 
 const FormItem = ({ formItem, onRowAction, checkedList, onCheckedItem }: {
     formItem: formItemProps,
@@ -73,23 +63,12 @@ const FormItem = ({ formItem, onRowAction, checkedList, onCheckedItem }: {
             <TableCell className="text-right">
                 <div className="h-full flex space-x-2">
                     <PencilRuler className="w-3.5 h-3.5 cursor-pointer" />
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Trash2 className="w-3.5 h-3.5 cursor-pointer" />
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>确认删除么</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    表单删除之后，随之对应的表单数据会一同删除且无法恢复，再次确认，是否需要删除？
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>取消</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => onRowAction(formItem.id, 'delete')}>确认</AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
+                    <IsSure 
+                        title="确认删除么？"
+                        description="表单删除之后，随之对应的表单数据会一同删除且无法恢复，再次确认，是否需要删除？"
+                        onConfirm={() => onRowAction(formItem.id, 'delete')}>
+                        <Trash2 className="w-3.5 h-3.5 cursor-pointer" />
+                    </IsSure>
                 </div>
             </TableCell>
         </TableRow>
@@ -188,30 +167,19 @@ export const FormList = ({
                         </TableCell>
                         <TableCell colSpan={5}>
                             <div className="flex justify-between">
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button 
-                                            variant="destructive"
-                                            size="sm"
-                                            className="flex space-x-1 h-8 text-xs" >
-                                            <Trash2 size="12" />
-                                            <span>批量删除</span>
-                                        </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle>确认删除么</AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                                表单删除之后，随之对应的表单数据会一同删除且无法恢复，再次确认，是否需要删除？
-                                            </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>取消</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => onRemoveSelected(checkedList)}>确认</AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-
+                                <IsSure 
+                                    title="确认删除么？"
+                                    description="表单删除之后，随之对应的表单数据会一同删除且无法恢复，再次确认，是否需要删除？"
+                                    onConfirm={() => onRemoveSelected(checkedList)} >
+                                    <Button 
+                                        variant="destructive"
+                                        size="sm"
+                                        className="flex space-x-1 h-8 text-xs" >
+                                        <Trash2 size="12" />
+                                        <span>批量删除</span>
+                                    </Button>
+                                </IsSure>
+                            
                                 {pagination ? (
                                     <div className="flex justify-end items-center space-x-2">
                                         <PaginationInfo
@@ -236,31 +204,15 @@ export const FormList = ({
     )
 }
 
-interface FormSearchBarProps {
-    searchInput: string,
-    onSearchInput: (searchInput: string) => void,
-    total: number,
-}
-
-const FormSearchBar = ({ searchInput, onSearchInput }: FormSearchBarProps) => {
+const TableButtonGroup = () => {
     return (
-        <div className="flex justify-between">
-            <div className="flex w-80 space-x-1">
-                <div className="flex w-64">
-                    <Input className="w-full h-8 text-xs focus-visible:ring-transparent"
-                        placeholder="搜索标题或者描述..."
-                        value={searchInput}
-                        onChange={(e) => onSearchInput(e.target.value)} />
-                </div>
-            </div>
-            <div className="flex items-center justify-end space-x-2">
-                <Button variant="outline" size="sm" className="flex items-center space-x-1 h-8 text-xs">
-                    <CirclePlus size="12" />
-                    <span>新增</span>
-                </Button>
-            </div>
+        <div className="flex items-center justify-end space-x-2">
+            <Button variant="outline" size="sm" className="flex items-center space-x-1 h-8 text-xs">
+                <CirclePlus size="12" />
+                <span>新增</span>
+            </Button>
         </div>
-    );
+    )
 }
 
 const Form = () => {
@@ -399,12 +351,14 @@ const Form = () => {
             <Header title="表单" />
             <Card className="py-5 mt-2">
                 <CardHeader className="py-2">
-                    <FormSearchBar
-                        searchInput={searchInput}
-                        onSearchInput={handleSearchInput}
-                        total={pagination?.total || 0} />
+                    <div className="flex justify-between">
+                        <SearchBar
+                            searchInput={searchInput}
+                            onSearchInput={handleSearchInput} />
+                        <TableButtonGroup />
+                    </div>
                 </CardHeader>
-                <CardContent className="">
+                <CardContent>
                     <FormList
                         forms={forms}
                         pagination={pagination}
