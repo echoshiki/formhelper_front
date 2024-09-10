@@ -1,4 +1,5 @@
 import axiosInstance from "@/utils/axiosInstance";
+import { paginationProps }  from "@/hooks/useListManager";
 
 export interface formItemProps {
     id: number,
@@ -10,17 +11,10 @@ export interface formItemProps {
     updated_at: string
 }
 
-export interface paginationProps {
-    total: number,
-    page: number,
-    page_size: number,
-    total_pages: number
-}
-
 interface getFormListResponse {
     code: number,
     msg: string,
-    info?: {
+    data?: {
         forms: formItemProps[],
         pagination: paginationProps,
         user: number,
@@ -33,6 +27,28 @@ interface getFormListProps {
     sort_field: string,
     sort_order: string,
     search: string,
+}
+
+interface getSubmissionListProps {
+    form_id: number,
+    page: number,
+    page_size: number,
+    sort_field: string,
+    sort_order: string,
+    search: string,
+}
+
+export interface submissionItemProps {
+    id: number,
+    user_id: number,
+    user: {
+        username: string,
+    },
+    form: {
+        title: string,
+    }
+    form_id: number,
+    submitted_at: string
 }
 
 class FormService {
@@ -53,7 +69,7 @@ class FormService {
                 return {
                     code: 200,
                     msg: msg,
-                    info: data
+                    data: data
                 }
             }
             return {
@@ -68,10 +84,10 @@ class FormService {
         }
     }
 
-    async removeFormItem(id: number) {
+    async removeFormSelected(ids: number[]) {
         try {
-            const response = await axiosInstance.post(`/formhelper/form/delete`, {
-                id: id,
+            const response = await axiosInstance.post(`/formhelper/form/deleteSelected`, {
+                ids: ids,
             });
             const { code, msg } = response.data;
             if (code == 0) {
@@ -92,9 +108,49 @@ class FormService {
         }   
     }
 
-    async removeFormSelected(ids: number[]) {
+    // 获取个人表单列表
+    async getSubmissionList({
+        form_id, 
+        page, 
+        page_size, 
+        sort_field, 
+        sort_order, 
+        search
+    }: getSubmissionListProps) {
         try {
-            const response = await axiosInstance.post(`/formhelper/form/deleteSelected`, {
+            const response = await axiosInstance.get(`/formhelper/form/submissions`, {
+                params: {
+                    form_id,
+                    page,
+                    page_size,
+                    sort_field,
+                    sort_order,
+                    search,
+                }
+            });
+            const { code, msg, data } = response.data;
+            if (code == 0) {
+                return {
+                    code: 200,
+                    msg: msg,
+                    data: data
+                }
+            }
+            return {
+                code: 500,
+                msg: msg
+            }
+        } catch(e) {
+            return {
+                code: 500,
+                msg: (e as Error).message
+            } 
+        }
+    }
+
+    async removeSubmissionSelected(ids: number[]) {
+        try {
+            const response = await axiosInstance.post(`/formhelper/form/deleteSubmissionSelected`, {
                 ids: ids,
             });
             const { code, msg } = response.data;

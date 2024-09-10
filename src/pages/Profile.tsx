@@ -83,7 +83,7 @@ const Profile = () => {
 			}
 			setUserInfo(userInfo);
 		}
-		setLoading(false);	
+		setLoading(false);
 	}
 
 	async function updateProfile() {
@@ -96,14 +96,14 @@ const Profile = () => {
 		const response = await AuthService.updateUser(updateInfo);
 		if (response.code == 200) {
 			toast({
-                title: "提示",
-                description: response.msg,
-            });
+				title: "提示",
+				description: response.msg,
+			});
 		} else {
 			toast({
-                title: "提示",
-                description: response.msg,
-            });
+				title: "提示",
+				description: response.msg,
+			});
 		}
 	}
 
@@ -124,77 +124,73 @@ const Profile = () => {
 		<>
 			<Header title="资料" />
 			<Card className="py-5 mt-2">
-				<CardContent className="space-y-3">
+				<CardContent className="w-1/2 space-y-3 mx-auto border rounded-lg px-10 pt-5 pb-10 mb-10">
 
-					<div className="flex space-x-10">
-						<div className="w-1/2 space-y-1">
-							<Label className="">账户</Label>
-							<Input type="text" className="bg-gray-300 border-none" value={userInfo.username} disabled />
-						</div>
-						<div className="w-1/2 space-y-1">
-							<Label>邮箱</Label>
-							<Input type="text" className="bg-gray-300 border-none" value={userInfo.email} disabled />
-						</div>
+					<div className="">
+						<Label className="">账户</Label>
+						<Input type="text" className="bg-gray-300 border-none" value={userInfo.username} disabled />
+					</div>
+
+					<div className="">
+						<Label>邮箱</Label>
+						<Input type="text" className="bg-gray-300 border-none" value={userInfo.email} disabled />
 					</div>
 
 					<div className="flex space-x-10">
-						<div className="w-1/2 space-y-1">
-							<Label className="">余额</Label>
+						<div className="">
+							<Label className="w-1/2">余额</Label>
 							<Input type="text" className="bg-gray-300 border-none" value={userInfo.money} disabled />
 						</div>
-						<div className="w-1/2 space-y-1">
+						<div className="w-1/2">
 							<Label>积分</Label>
 							<Input type="text" className="bg-gray-300 border-none" value={userInfo.score} disabled />
 						</div>
 					</div>
 
-					<div className="flex space-x-10">
-						<div className="w-1/2 space-y-1">
-							<Label className="">昵称</Label>
-							<Input type="text" name="nickname" className="bg-gray-100 border-none" value={userInfo.nickname} onChange={handleInputChange} />
-						</div>
-						<div className="w-1/2 space-y-1">
-							<Label>性别</Label>
-							<Select name="sex" onValueChange={(value) => setUserInfo({ ...userInfo, sex: value })} value={userInfo.sex} >
-								<SelectTrigger className="bg-gray-100">
-									<SelectValue placeholder="请选择性别" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="0">男</SelectItem>
-									<SelectItem value="1">女</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
+					<div className="">
+						<Label className="">昵称</Label>
+						<Input type="text" name="nickname" className="bg-gray-100 border-none" value={userInfo.nickname} onChange={handleInputChange} />
+					</div>
+					<div className="">
+						<Label>性别</Label>
+						<Select name="sex" onValueChange={(value) => setUserInfo({ ...userInfo, sex: value })} value={userInfo.sex} >
+							<SelectTrigger className="bg-gray-100">
+								<SelectValue placeholder="请选择性别" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="0">男</SelectItem>
+								<SelectItem value="1">女</SelectItem>
+							</SelectContent>
+						</Select>
 					</div>
 
-					<div className="flex space-x-10">
-						<div className="w-1/2 space-y-1">
-							<Label className="">手机</Label>
-							<Input type="text" name="mobile" className="bg-gray-100 border-none" value={userInfo.mobile} onChange={handleInputChange} />
-						</div>
-						<div className="w-1/2 space-y-1">
-							<Label>生日</Label>
-							<Popover>
-								<PopoverTrigger asChild>
-									<Input type="text" name="birthday" className="bg-gray-100 border-none" value={userInfo.birthday} onChange={handleInputChange} />
-								</PopoverTrigger>
-								<PopoverContent className="w-auto p-0" align="start">
-									<Calendar
-										mode="single"
-										selected={parseDate(userInfo.birthday)}
-										onSelect={handleDateSelect}
-										defaultMonth={parseDate(userInfo.birthday)}
-										initialFocus
-									/>
-								</PopoverContent>
-							</Popover>
-						</div>
+					<div className="">
+						<Label className="">手机</Label>
+						<Input type="text" name="mobile" className="bg-gray-100 border-none" value={userInfo.mobile} onChange={handleInputChange} />
 					</div>
 
+					<div className="">
+						<Label>生日</Label>
+						<Popover>
+							<PopoverTrigger asChild>
+								<Input type="text" name="birthday" className="bg-gray-100 border-none" value={userInfo.birthday} onChange={handleInputChange} />
+							</PopoverTrigger>
+							<PopoverContent className="w-auto p-0" align="start">
+								<Calendar
+									mode="single"
+									selected={parseDate(userInfo.birthday)}
+									onSelect={handleDateSelect}
+									defaultMonth={parseDate(userInfo.birthday)}
+									initialFocus
+								/>
+							</PopoverContent>
+						</Popover>
+					</div>
+					<div className="w-full">
+						<Button className="mt-3" onClick={updateProfile}>立即修改</Button>
+					</div>
+					
 				</CardContent>
-				<CardFooter className="border-t px-6 py-4">
-					<Button onClick={updateProfile}>立即修改</Button>
-				</CardFooter>
 			</Card>
 		</>
 	);

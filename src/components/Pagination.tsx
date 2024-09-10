@@ -17,7 +17,6 @@ import {
   } from "@/components/ui/select"
 import { ChevronFirst, ChevronLast, ChevronLeft, ChevronRight } from "lucide-react";
 
-
 interface paginationInfoProps {
     page: number,
     page_size: number,
