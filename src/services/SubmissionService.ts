@@ -1,17 +1,21 @@
 import axiosInstance from "@/utils/axiosInstance";
 
-// 导出返回的表单数据项结构类型
-export interface formItemProps {
+// 导出返回的提交数据项结构类型
+export interface submissionItemProps {
     id: number,
-    title: string,
-    description: string,
-    submissions_count: number,
-    expired_at: string,
-    created_at: string,
-    updated_at: string
+    user_id: number,
+    user: {
+        username: string,
+    },
+    form: {
+        title: string,
+    }
+    form_id: number,
+    submitted_at: string
 }
 
-interface getFormListProps {
+interface getSubmissionListProps {
+    form_id: number,
     page: number,
     page_size: number,
     sort_field: string,
@@ -19,12 +23,21 @@ interface getFormListProps {
     search: string,
 }
 
-class FormService {
-    // 获取个人表单列表
-    async getFormList({page, page_size, sort_field, sort_order, search}: getFormListProps) {
+class SubmissionService {
+
+    // 获取提交数据列表
+    async getSubmissionList({
+        form_id, 
+        page, 
+        page_size, 
+        sort_field, 
+        sort_order, 
+        search
+    }: getSubmissionListProps) {
         try {
-            const response = await axiosInstance.get(`/formhelper/form/list`, {
+            const response = await axiosInstance.get(`/formhelper/submission/list`, {
                 params: {
+                    form_id,
                     page,
                     page_size,
                     sort_field,
@@ -52,9 +65,9 @@ class FormService {
         }
     }
 
-    async removeFormSelected(ids: number[]) {
+    async removeSubmissionSelected(ids: number[]) {
         try {
-            const response = await axiosInstance.post(`/formhelper/form/deleteSelected`, {
+            const response = await axiosInstance.post(`/formhelper/submission/deleteSelected`, {
                 ids: ids,
             });
             const { code, msg } = response.data;
@@ -77,4 +90,4 @@ class FormService {
     }
 }
 
-export default new FormService();
+export default new SubmissionService();

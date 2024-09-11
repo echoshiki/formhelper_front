@@ -9,6 +9,7 @@ import Profile from '@/pages/Profile';
 import Form from '@/pages/Form';
 import Test from '@/pages/Test';
 import Submission from '@/pages/Submission';
+import SubmissionView from '@/pages/SubmissionView';
 
 interface privateRouteProps {
 	element: React.ReactNode,
@@ -30,7 +31,8 @@ function App() {
 				<Route path="/" element={<PrivateRoute element={<Home />} currentUser={currentUser} />} />
 				<Route path="/profile" element={<PrivateRoute element={<Profile />} currentUser={currentUser} />} />
 				<Route path="/forms" element={<PrivateRoute element={<Form />} currentUser={currentUser} />} />
-				<Route path="/submissions/:form_id" element={<PrivateRoute element={<Submission />} currentUser={currentUser} />} />
+				<Route path="/submissions/form_id/:form_id" element={<PrivateRoute element={<Submission />} currentUser={currentUser} />} />
+				<Route path="/submissions/:id" element={<PrivateRoute element={<SubmissionView />} currentUser={currentUser} />} />
 				<Route path="/test" element={<Test />} />
 			</Routes>
 		</RootLayout>

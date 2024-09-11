@@ -4,17 +4,17 @@ import Header from "@/layouts/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import FormService, { submissionItemProps } from "@/services/FormService";
+import SubmissionService, { submissionItemProps } from "@/services/SubmissionService";
 import useListManager, { paginationProps } from "@/hooks/useListManager";
 import { SortableTableHead } from "@/components/SortableTableHead";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import dateFormatter from "@/utils/dateFormatter";
 import { IsSure } from "@/components/package/IsSure";
-import { Trash2, PencilRuler } from "lucide-react";
+import { Trash2, Eye } from "lucide-react";
 import { PaginationInfo, PaginationSimple } from "@/components/Pagination";
 import { showToast } from "@/utils/common";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Spinner } from "@/components/package/Spinner";
 
 interface submissionListProps {
@@ -57,7 +57,6 @@ const SubmissionList = ({
                 <TableHeader>
                     <TableRow>
                         <TableHead></TableHead>
-                        <TableHead>ID</TableHead>
                         <TableHead>数据</TableHead>
                         <TableHead>所属表单</TableHead>
                         <SortableTableHead
@@ -76,23 +75,19 @@ const SubmissionList = ({
                                     onCheckedChange={() => handleCheckedItem(item.id)} />
                             </TableCell>
                             <TableCell>
-                                {item.id}
-                            </TableCell>
-
-                            <TableCell>
                                 用户 [{item.user.username}] 提交的数据
                             </TableCell>
                             <TableCell>
                                 {item.form.title}
                             </TableCell>
-
                             <TableCell className="font-mono">
-                                <Badge variant={`${new Date(item.submitted_at) < new Date() ? "destructive" : "secondary"}`} >{dateFormatter(new Date(item.submitted_at))}</Badge>
+                                <Badge>{dateFormatter(new Date(item.submitted_at))}</Badge>
                             </TableCell>
                             <TableCell className="text-right">
-
                                 <div className="h-full flex space-x-2">
-                                    <PencilRuler className="w-3.5 h-3.5 cursor-pointer" />
+                                    <Link to={`/submissions/${item.id}`} className="cursor-pointer flex items-center">
+                                        <Eye className="w-3.5 h-3.5 cursor-pointer" />
+                                    </Link>
                                     <IsSure
                                         title="确认删除么？"
                                         description="表单删除之后，随之对应的表单数据会一同删除且无法恢复，再次确认，是否需要删除？"
@@ -168,14 +163,14 @@ const Submission = () => {
         handleSetPage,
         handleSetPageSize,
         handleSetSort
-    } = useListManager<submissionItemProps>(FormService.getSubmissionList, { form_id: form_id });
+    } = useListManager<submissionItemProps>(SubmissionService.getSubmissionList, { form_id: form_id });
     
     const handleRemoveSelected = async (ids: number[]) => {
         if (ids.length === 0) {
             showToast('请选择需要删除的项目。', 2);
             return false;
         }
-        const response = await FormService.removeSubmissionSelected(ids);
+        const response = await SubmissionService.removeSubmissionSelected(ids);
         if (response.code == 200) {
             setItems(prevItems => prevItems.filter(item => !ids.includes(item.id)));
             showToast(response.msg);

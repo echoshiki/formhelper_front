@@ -58,7 +58,7 @@ const FormItem = ({ formItem, checkedList, onCheckedItem, onRemoveButton }: {
                 <Badge variant="secondary">{dateFormatter(new Date(formItem.created_at))}</Badge>
             </TableCell>
             <TableCell>
-                <Link to={`/submissions/${formItem.id}`} className="cursor-pointer flex items-center">
+                <Link to={`/submissions/form_id/${formItem.id}`} className="cursor-pointer flex items-center">
                     <Search className="w-3.5 h-3.5 mr-1" />
                     {formItem.submissions_count}
                 </Link>
