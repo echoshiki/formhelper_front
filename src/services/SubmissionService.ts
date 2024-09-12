@@ -14,6 +14,20 @@ export interface submissionItemProps {
     submitted_at: string
 }
 
+// 导出返回的提交数据项详情的结构类型
+export interface submissionViewProps {
+    fields: submissionFieldProps[],
+    username: string,
+    submitted_at: string
+}
+
+interface submissionFieldProps {
+    id: number,
+    label: string,
+    value: string,
+    type: string
+}
+
 interface getSubmissionListProps {
     form_id: number,
     page: number,
@@ -21,6 +35,10 @@ interface getSubmissionListProps {
     sort_field: string,
     sort_order: string,
     search: string,
+}
+
+interface getSubmissionViewProps {
+    id: number
 }
 
 class SubmissionService {
@@ -88,6 +106,35 @@ class SubmissionService {
             } 
         }   
     }
+
+    // 获取提交数据列表
+    async getSubmissionView({ id }: getSubmissionViewProps) {
+        try {
+            const response = await axiosInstance.get(`/formhelper/submission/view`, {
+                params: {
+                    id
+                }
+            });
+            const { code, msg, data } = response.data;
+            if (code == 0) {
+                return {
+                    code: 200,
+                    msg: msg,
+                    data: data
+                }
+            }
+            return {
+                code: 500,
+                msg: msg
+            }
+        } catch(e) {
+            return {
+                code: 500,
+                msg: (e as Error).message
+            } 
+        }
+    }
+
 }
 
 export default new SubmissionService();
