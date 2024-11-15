@@ -1,6 +1,6 @@
 import { useState } from "react";
 import FormService, { formItemProps } from "@/services/FormService";
-import dateFormatter from "@/utils/dateFormatter";
+import { dateFormatter } from "@/utils/dateFormatter";
 
 import Header from "@/layouts/Header";
 import { PaginationInfo, PaginationSimple } from "@/components/Pagination";
@@ -16,7 +16,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Spinner } from "@/components/package/Spinner";
-import { CirclePlus, PencilRuler, Search, Trash2 } from "lucide-react";
+import { CirclePlus, PencilRuler, Search, Trash2, UserCircleIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { SearchBar } from "@/components/SearchBar";
@@ -39,7 +39,7 @@ const FormItem = ({ formItem, checkedList, onCheckedItem, onRemoveButton }: {
                     checked={checkedList.includes(formItem.id)}
                     onCheckedChange={() => onCheckedItem(formItem.id)} />
             </TableCell>
-            <TableCell className="w-96">
+            <TableCell className="w-60">
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger className="text-left">
@@ -52,10 +52,19 @@ const FormItem = ({ formItem, checkedList, onCheckedItem, onRemoveButton }: {
                 </TooltipProvider>
             </TableCell>
             <TableCell className="font-mono">
+                <Badge variant="secondary">{dateFormatter(new Date(formItem.started_at))}</Badge>
+            </TableCell>
+            <TableCell className="font-mono">
                 <Badge variant={`${new Date(formItem.expired_at) < new Date() ? "destructive" : "secondary" }`} >{dateFormatter(new Date(formItem.expired_at))}</Badge>
             </TableCell>
             <TableCell className="font-mono">
                 <Badge variant="secondary">{dateFormatter(new Date(formItem.created_at))}</Badge>
+            </TableCell>
+            <TableCell>
+                <div className="cursor-pointer flex items-center">
+                    <UserCircleIcon className="w-3.5 h-3.5 mr-1" />
+                    {formItem.limited}
+                </div>
             </TableCell>
             <TableCell>
                 <Link to={`/submissions/form_id/${formItem.id}`} className="cursor-pointer flex items-center">
@@ -120,13 +129,18 @@ export const FormList = ({
                         <TableHead></TableHead>
                         <TableHead>标题</TableHead>
                         <SortableTableHead 
+                            title="开始时间"
+                            field="started_at"
+                            onSetSort={onSetSort} />
+                        <SortableTableHead 
                             title="过期时间"
                             field="expired_at"
                             onSetSort={onSetSort} />
-                       <SortableTableHead 
-                            title="创建时间"
+                        <SortableTableHead 
+                            title="创建日期"
                             field="created_at"
                             onSetSort={onSetSort} />
+                        <TableHead>限制数</TableHead>
                         <TableHead>数据量</TableHead>
                         <TableHead>操作</TableHead>
                     </TableRow>
@@ -205,6 +219,8 @@ const TableButtonGroup = () => {
 
 const Form = () => { 
     // 列表相关逻辑方法封装进 Hook 内
+    // 传入数据接口服务
+    // 解构出所需的数据与函数
     const {
         items: forms,
         setItems: setForms,

@@ -9,7 +9,7 @@ import useListManager, { paginationProps } from "@/hooks/useListManager";
 import { SortableTableHead } from "@/components/SortableTableHead";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import dateFormatter from "@/utils/dateFormatter";
+import { dateFormatter } from "@/utils/dateFormatter";
 import { IsSure } from "@/components/package/IsSure";
 import { Trash2, Eye } from "lucide-react";
 import { PaginationInfo, PaginationSimple } from "@/components/Pagination";
