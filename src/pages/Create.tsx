@@ -20,8 +20,29 @@ import { dateFormatter, parseDate } from "@/utils/dateFormatter";
 import Header from "@/layouts/Header";
 import { useState } from "react";
 import FormService, { formBaseProps, formFieldsProps } from "@/services/FormService";
-import { BookmarkXIcon, CopyPlusIcon, Delete, DeleteIcon, ListXIcon, X } from "lucide-react";
+import { CopyPlusIcon, FileText, ListXIcon } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+
+
+interface OptionProps {
+    value: string,
+    index: number,
+    onRemoveOption: (key: number) => void,
+    onChangeOption: (key: number, value: string) => void,
+}
+
+const OptionItem = ({ value, index, onRemoveOption, onChangeOption }: OptionProps) => {
+    return (
+        <div className="flex space-x-2 items-center mt-2">
+            <a href="#" onClick={() => onRemoveOption(index)}><ListXIcon size="24" /></a>
+            <Input type="text" 
+                placeholder="选项"
+                value={value}
+                onChange={e => onChangeOption(index, e.target.value)} />
+        </div>
+    )
+}
 
 interface FieldsProps {
     formFields: formFieldsProps[],
@@ -38,6 +59,11 @@ const Fields = ({ formFields, onAddField, onRemoveField }: FieldsProps) => {
         sort: 99
     });
 
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+    // 错误信息
+    const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({});
+
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
         const {name, value} = event.target;
         setField({
@@ -53,7 +79,8 @@ const Fields = ({ formFields, onAddField, onRemoveField }: FieldsProps) => {
         });
     };
 
-    const addOption = () => {
+    // 添加选项
+    const handleAddOption = () => {
         const nextOptions = field.options;
         nextOptions.push("");
         setField({
@@ -62,7 +89,8 @@ const Fields = ({ formFields, onAddField, onRemoveField }: FieldsProps) => {
         });
     };
 
-    const removeOption = (index: number) => {
+    // 删除选项
+    const handleRemoveOption = (index: number) => {
         const nextOptions = field.options.filter((_, key) => index!=key);
         setField({
             ...field,
@@ -70,21 +98,55 @@ const Fields = ({ formFields, onAddField, onRemoveField }: FieldsProps) => {
         });
     };
 
-    const handleOptionChange = (index: number, value: string) => {
+    // 输入选项
+    const handleChangeOption = (index: number, value: string) => {
         const nextOptions = field.options.slice();
         nextOptions[index] = value;
         setField({
             ...field,
             options: nextOptions,
-        })
+        });
     };
+
+    // 提交并对提交的字段进行一系列处理
+    const onSubmitField = () => {
+        // 验证字段
+        if (!validateField()) return false;
+        // 关闭抽屉
+        setIsDrawerOpen(false);
+        // 添加字段
+        onAddField(field);
+        setField({
+            label: "",
+            field_type: "",
+            options: ["", ""],
+            required: false,
+            sort: 99
+        });
+    }
+
+    // 验证字段填写
+    const validateField = (): boolean => {
+        const newFieldErrors: {[key: string]: string} = {};
+        if (!field.label.trim()) {
+            newFieldErrors.label = "名称不能为空";
+        }
+        if (!field.field_type) {
+            newFieldErrors.field_type = "必须选择字段类型";
+        }
+        if (field.field_type === "checkbox" && field.options.every(option => !option.trim())) {
+            newFieldErrors.options = "至少填写一个有效的选项";
+        }
+        setFieldErrors(newFieldErrors);
+        return Object.keys(newFieldErrors).length === 0;
+    }
 
     return (
         <>
             <div className="flex space-x-2">
-                <Drawer>
+                <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
                     <DrawerTrigger>
-                        <Button><CopyPlusIcon />&nbsp;&nbsp;添加</Button>
+                        <span className="w-24 rounded  border flex items-center py-2 justify-center text-sm font-medium"><CopyPlusIcon size="20" />&nbsp;&nbsp;添加</span>
                     </DrawerTrigger>
                     <DrawerContent>
                         <div className="w-4/5 lg:w-3/4 xl:w-2/3 mx-auto max-h-[36rem] overflow-scroll">
@@ -93,6 +155,7 @@ const Fields = ({ formFields, onAddField, onRemoveField }: FieldsProps) => {
                                 <DrawerDescription>在这里可以选择添加多种类型的自定义项，比如文本、数字、单选以及多选.</DrawerDescription>
                             </DrawerHeader>
                             <div className="flex flex-wrap space-y-2 px-4">
+
                                 <div className="w-full">
                                     <Label>名称</Label>
                                     <Input type="text" 
@@ -101,7 +164,9 @@ const Fields = ({ formFields, onAddField, onRemoveField }: FieldsProps) => {
                                         className="mt-2"
                                         value={field.label}
                                         onChange={handleInputChange} />
+                                        {fieldErrors.label && <p className="text-red-500 text-sm mt-1">{fieldErrors.label}</p>}
                                 </div>
+
                                 <div className="w-full">
                                     <Label>类型</Label>
                                     <Select name="field_type" onValueChange={value => setField({ ...field, field_type: value })} value={field.field_type}>
@@ -110,32 +175,40 @@ const Fields = ({ formFields, onAddField, onRemoveField }: FieldsProps) => {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="text">文本</SelectItem>
-                                            <SelectItem value="checkbox">多选</SelectItem>
                                             <SelectItem value="radio">单选</SelectItem>
+                                            <SelectItem value="checkbox">多选</SelectItem>
                                             <SelectItem value="date">日期</SelectItem>
                                         </SelectContent>
                                     </Select>
+                                    {fieldErrors.field_type && <p className="text-red-500 text-sm mt-1">{fieldErrors.field_type}</p>}
                                 </div>
-                                {field.field_type === 'checkbox' && (
+                                {(field.field_type === 'checkbox' || field.field_type === 'radio')  && (
                                 <div className="w-full">
                                     <Label>选项设置</Label>
                                     {field.options.map((item, key) => (
-                                        <div key={key} className="flex space-x-2 items-center mt-2">
-                                            <a href="#" onClick={() => removeOption(key)}><ListXIcon size="24" /></a>
-                                            <Input type="text" 
-                                                name="option[]"
-                                                placeholder="选项"
-                                                value={item}
-                                                onChange={e => handleOptionChange(key, e.target.value)} />
-                                        </div>
-                                    ))}                                       
+                                        <OptionItem key={key}
+                                            index={key}
+                                            value={item}
+                                            onRemoveOption={handleRemoveOption}
+                                            onChangeOption={handleChangeOption} />
+                                    ))} 
+                                    {fieldErrors.options && <p className="text-red-500 text-sm mt-1">{fieldErrors.options}</p>}                                      
                                     <Button variant="outline" 
                                         className="w-full flex items-center mt-2 text-sm"
-                                        onClick={addOption} >
+                                        onClick={handleAddOption} >
                                         <CopyPlusIcon size="16"/>&nbsp;&nbsp;添加选项
                                     </Button>
                                 </div>
                                 )}
+                                <div className="w-full">
+                                    <Label>排序</Label>
+                                    <Input type="text" 
+                                        name="sort"
+                                        placeholder="设置字段的顺序" 
+                                        className="mt-2"
+                                        value={field.sort}
+                                        onChange={handleInputChange} />
+                                </div>
                                 <div className="w-full flex items-center space-x-5 py-5">
                                     <div>
                                         <Label>是否必填</Label>
@@ -147,21 +220,52 @@ const Fields = ({ formFields, onAddField, onRemoveField }: FieldsProps) => {
                             </div>
 
                             <DrawerFooter>
-                                <Button>提交</Button>
+                                <Button onClick={onSubmitField}>提交</Button>
                                 <DrawerClose>
-                                    <Button className="w-full" variant="outline">取消</Button>
+                                    <span className="w-full rounded  border flex items-center py-2 justify-center text-sm font-medium">取消</span>
                                 </DrawerClose>
                             </DrawerFooter>
                         </div>
-                        
                     </DrawerContent>                 
                 </Drawer>
             </div>
-            <div className="">
+            <div className="mt-5 flex flex-wrap space-y-3 border p-5 md:p-8 rounded">
+                <p className="flex items-center text-slate-600 text-xs">
+                    <FileText size="12" />&nbsp;表单示例
+                </p>
                 {formFields.map((item, key) => (
-                    <div className="flex space-x-2" key={key}>
-                        <Label>{item.label}</Label>
-                    </div>
+                <div className="w-full" key={key}>
+                    <Label className=" text-slate-600">
+                        {item.label}{item.required && <span className="text-red-500">{` * `}</span>}
+                    </Label>
+                    {(item.field_type === "text" || item.field_type === "date") && (
+                        <Input type="text" className="mt-2"/>
+                    )}
+                    {item.field_type === "checkbox" && (
+                        <div className="flex items-center space-x-3 mt-2">
+                        {item.options.map((option, key) => (
+                            <p className="flex items-center text-sm" key={key}>
+                                <Checkbox />
+                                &nbsp;&nbsp;{option}
+                            </p> 
+                        ))}
+                        </div>  
+                    )}
+                    {item.field_type === "radio" && (
+                        <div className="flex flex-wrap space-y-2 mt-2">
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="请选择" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                {item.options.map((option, key) => (
+                                    <SelectItem key={key} value={option}>{option}</SelectItem>
+                                ))}
+                                </SelectContent>
+                            </Select>
+                        </div> 
+                    )}
+                </div>
                 ))}
             </div>
         </>
@@ -182,6 +286,18 @@ const Create = () => {
 
     // 储存字段集合的状态
     const [formFields, setFormFields] = useState<formFieldsProps[]>([]);
+    // 管理日期弹出框的状态
+    const [isPopOpen, setIsPopOpen] = useState<{[key: string]: boolean}>({
+        started_at: false,
+        expired_at: false
+    });
+
+    const togglePopOpen = (field: string, status: boolean) => {
+        setIsPopOpen({
+            ...isPopOpen,
+            [field]: status,
+        });
+    }
     
     // 添加字段进状态
     const handleAddField = (fieldItem: formFieldsProps) => {
@@ -189,6 +305,7 @@ const Create = () => {
             ...formFields,
             fieldItem
         ]);
+        console.log(formFields);
     };
 
     // 删除字段出状态
@@ -212,7 +329,9 @@ const Create = () => {
                 ...formBase,
                 [field]: formattedDate,
             });
-        }  
+        }
+        // 关闭弹窗
+        togglePopOpen(field, false);
     };
 
     const handleCheckedChange = (checked: boolean, name: string) => {
@@ -223,6 +342,8 @@ const Create = () => {
     };
 
     const handleCreateForm = async () => {
+        console.log(formBase);
+        console.log(formFields);
         // const response = await FormService.createForm(formBase, []);
 
     }
@@ -285,7 +406,7 @@ const Create = () => {
                     <div className="flex flex-wrap space-y-2">
                         <div className="w-full">
                             <Label>开始时间</Label>
-                            <Popover onOpenChange={(open) => open || null}>
+                            <Popover open={isPopOpen.started_at} onOpenChange={(status) => togglePopOpen("started_at", status)}>
 								<PopoverTrigger asChild>
 									<Input type="text" 
                                         name="started_at" 
@@ -306,7 +427,7 @@ const Create = () => {
                         </div>
                         <div className="w-full">
                             <Label>截止时间</Label>
-                            <Popover>
+                            <Popover open={isPopOpen.expired_at} onOpenChange={(status) => togglePopOpen("expired_at", status)}>
 								<PopoverTrigger asChild>
 									<Input type="text"
                                         name="expired_at" 
