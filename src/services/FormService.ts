@@ -91,7 +91,7 @@ class FormService {
             return {
                 code: 500,
                 msg: msg
-            }
+            }  
         } catch (e) {
             return {
                 code: 500,
@@ -100,10 +100,29 @@ class FormService {
         }   
     }
 
-    async createForm(formBase: formBaseProps, formFields: formFieldsProps) {
-        console.log(formBase, '基础信息：');
-        console.log(formFields, '字段信息');
-        return 1;
+    async createForm(formBase: formBaseProps, formFields: formFieldsProps[]) {
+        try {
+            const response = await axiosInstance.post(`/formhelper/form/create`, {
+                formBase: formBase,
+                formFields: formFields
+            });
+            const { code, msg } = response.data;
+            if (code == 0) {
+                return {
+                    code: 200,
+                    msg: msg
+                }
+            }
+            return {
+                code: 500,
+                msg: msg
+            }
+        } catch (e) {
+            return {
+                code: 500,
+                msg: (e as Error).message
+            } 
+        }
     }
 }
 

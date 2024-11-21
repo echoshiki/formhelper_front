@@ -1,74 +1,68 @@
-import { Button } from "@/components/ui/button"
-import { useState } from "react";
+import React from 'react';
+import { DragDropContext, Draggable } from 'react-beautiful-dnd';
+import { StrictModeDroppable as Droppable } from '@/components/StrictModeDroppable'
 
-const Game = () => {
-    const [history, setHistory] = useState([Array(9).fill(null)]);
-    const [move, setMove] = useState(0);
-    const currentSquares = history[move];
-    const nextPlayer = move%2 === 0 ? "X" : "O";
-    const winnerInfo = calculateWinner(currentSquares);
-    const winnerLines = winnerInfo ? winnerInfo.lines : [];
+// 示例字段数据
+const initialFields = [
+    { id: '1', label: '姓名' },
+    { id: '2', label: '年龄' },
+    { id: '3', label: '手机号码' },
+];
 
-    let Message = move === 0 ? '游戏开始！' : '下一步走棋的是：' + nextPlayer;
-    Message = winnerInfo ? '游戏结束！获胜的是：' + winnerInfo.winner : 
-                (move === 9 ? '游戏结束！本轮结果：平局。' : Message);
+const DraggableFields = () => {
+    const [formFields, setFormFields] = React.useState(initialFields);
 
-    const handleClickSquare = (key: number) => {
-        if (currentSquares[key] || winnerInfo) {
-            return ;
-        }
-        const nextSquares = currentSquares.slice();
-        nextSquares[key] = nextPlayer;
-        const nextHistory = [...history.slice(0, move + 1), nextSquares];
-        setHistory(nextHistory);
-        setMove(move => move + 1);
-    }
+    // 处理拖拽完成事件
+    const handleDragEnd = (result: any) => {
+        // 解构出原位置与目标位置的对象（index）
+        const { source, destination } = result;
 
-    const jumpTo = (key: number) => {
-        setMove(key);
-    }
+        // 如果没有目标位置，直接返回
+        if (!destination) return;
+
+        // 通过将原位置（source）删除的数组元素插入到目标位置（destination）组成新的数组来实现重新排序字段
+        // 因为需要改变数组，所以创建一个状态量 formFields 的副本
+        const reorderedFields = Array.from(formFields);
+        // splice() 方法删除数组的元素，source.index 开始，1 为删除个数
+        // 返回被删除的元素数组（可能为多个）
+        // 数组解构，将剔除的元素返回赋值给 movedField
+        const [movedField] = reorderedFields.splice(source.index, 1);
+        // 向指定索引的地方插入元素（moveField），0 表示不删除任何元素
+        reorderedFields.splice(destination.index, 0, movedField);
+
+        // 更新原数组状态量
+        setFormFields(reorderedFields);
+    };
 
     return (
-        <>
-            <p className="text-sm my-5">{Message}</p>
-            <div className="flex space-x-5">
-                <div className="flex flex-wrap w-96 h-96">
-                    {currentSquares.map((item, key) => (
-                        <Button key={key} 
-                            variant={`outline`}
-                            className={`w-32 h-32 ${winnerLines.includes(key) && 'bg-indigo-600 text-white'}`}
-                            onClick={() => handleClickSquare(key)} >{item}</Button>
-                    ))} 
-                </div>
-                <div className="">
-                    {history.map((_item, key) => (
-                        <p key={key} ><a href="#" onClick={() => jumpTo(key)} className="underline">
-                            #{key}. {key > 0 ? `跳至第 ${key} 步` : `跳至最开始`}
-                        </a></p>  
-                    ))}
-                </div>
-            </div>
-            
-        </>
-    )
-}
+        <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="f1">
+                {(provided) => (
+                    <div
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                        className="space-y-2"
+                    >
+                        {formFields.map((field, index) => (
+                            <Draggable key={field.id} draggableId={field.label} index={index}>
+                                {(provided) => (
+                                    <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        className="flex items-center space-x-4 p-2 bg-gray-100 border rounded"
+                                    >
+                                        <span className="font-medium">{field.label}</span>
+                                    </div>
+                                )}
+                            </Draggable>
+                        ))}
+                        {provided.placeholder}
+                    </div>
+                )}
+            </Droppable>
+        </DragDropContext>
+    );
+};
 
-function calculateWinner (squares: number[]) {
-    const winnerLines = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8],
-        [0, 3, 6], [1, 4, 7], [2, 5, 8],
-        [0, 4, 8], [2, 4, 6]
-    ];
-    for (let i = 0; i < winnerLines.length; i++) {
-        const [a, b, c] = winnerLines[i];
-        if (squares[a] && squares[a] === squares[b] && squares[b] === squares[c]) {
-            return {
-                winner: squares[a],
-                lines: winnerLines[i]
-            }
-        }
-    }
-    return false;
-}
-
-export default Game;
+export default DraggableFields;
