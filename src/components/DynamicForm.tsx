@@ -79,8 +79,10 @@ const FieldsPanel = ({formFields, onRemoveField, onDragEnd}: FieldsPanelProps) =
 		switch (field.field_type) {
 			case 'text':
 				return <Input type="text" className="mt-2" />;
+			case 'number':
+				return <Input type="number" className="mt-2" />;
 			case 'date':
-				return <Input type="text" className="mt-2" />;
+				return <Input type="text" className="mt-2 bg-gray-100 border-none" />;
 			case 'textarea':
 				return <Textarea className="mt-2" />;
 			case 'select':
@@ -307,6 +309,7 @@ const FieldsDrawer = ({ onAddField }: FieldsDrawerProps) => {
 									</SelectTrigger>
 									<SelectContent>
 										<SelectItem value="text">文本</SelectItem>
+										<SelectItem value="number">数字</SelectItem>
 										<SelectItem value="select">单选</SelectItem>
 										<SelectItem value="checkbox">多选</SelectItem>
 										<SelectItem value="switch">是否</SelectItem>
