@@ -130,7 +130,7 @@ const FieldsPanel = ({formFields, onRemoveField, onDragEnd}: FieldsPanelProps) =
 							className="w-full"
 						>
 							{formFields.map((item: formFieldsProps, key: number) => (
-								<Draggable key={item.label} draggableId={item.label} index={key}>
+								<Draggable key={item.label + key} draggableId={item.label + key} index={key}>
 									{(provided) => (
 										<div
 											key={key}
