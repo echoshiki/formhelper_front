@@ -24,7 +24,13 @@ interface getFormListProps {
     search: string,
 }
 
+export interface formActionProps {
+    formBase: formBaseProps,
+    formFields: formFieldsProps[]
+}
+
 export interface formBaseProps {
+    id: string,
     title: string,
     description: string,
     started_at: string,
@@ -100,9 +106,67 @@ class FormService {
         }   
     }
 
-    async createForm(formBase: formBaseProps, formFields: formFieldsProps[]) {
+    async getFormView(id: string) {
+        try {
+            const response = await axiosInstance.get(`/formhelper/form/view`, {
+                params: {
+                    id: id,
+                }
+            });
+
+            const { code, msg, data } = response.data;
+            if (code == 0) {
+                
+                return {
+                    code: 200,
+                    msg: msg,
+                    data: data
+                }
+            }
+            return {
+                code: 500,
+                msg: msg,
+                data: []
+            } 
+        } catch (e) {
+            return {
+                code: 500,
+                msg: (e as Error).message
+            } 
+        }
+    }
+
+    async createForm({formBase, formFields}: formActionProps) {
         try {
             const response = await axiosInstance.post(`/formhelper/form/create`, {
+                formBase: formBase,
+                formFields: formFields
+            });
+            const { code, msg } = response.data;
+            if (code == 0) {
+                return {
+                    code: 200,
+                    msg: msg,
+                    url: '/forms'
+                }
+            }
+            return {
+                code: 500,
+                msg: msg
+            }
+        } catch (e) {
+            return {
+                code: 500,
+                msg: (e as Error).message
+            } 
+        }
+    }
+
+    async editForm ({formBase, formFields}: formActionProps) {
+        console.log(formBase);
+        console.log(formFields);
+        try {
+            const response = await axiosInstance.post(`/formhelper/form/edit`, {
                 formBase: formBase,
                 formFields: formFields
             });
@@ -121,7 +185,7 @@ class FormService {
             return {
                 code: 500,
                 msg: (e as Error).message
-            } 
+            }
         }
     }
 }

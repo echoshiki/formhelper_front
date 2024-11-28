@@ -21,7 +21,6 @@ const SubmissionView = () => {
         const response = await SubmissionService.getSubmissionView({
             id: Number(id),
         });
-        console.log(response);
         setData(response.data);
         if (response.code == 200)
             setLoading(false);
@@ -60,7 +59,7 @@ const SubmissionView = () => {
                                 {data?.fields.map((field) => (
                                     <TableRow key={field.id}>
                                         <TableCell>{field.label}</TableCell>
-                                        <TableCell>{field.type}</TableCell>
+                                        <TableCell>{field.field_type}</TableCell>
                                         <TableCell>{field.value}</TableCell>
                                     </TableRow>
                                 ))}

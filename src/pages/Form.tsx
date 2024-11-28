@@ -1,14 +1,12 @@
 import { useState } from "react";
 import FormService, { formItemProps } from "@/services/FormService";
 import { dateFormatter } from "@/utils/dateFormatter";
-
+import { QRCodeCanvas } from 'qrcode.react';
 import Header from "@/layouts/Header";
 import { PaginationInfo, PaginationSimple } from "@/components/Pagination";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
 import {
     Tooltip,
     TooltipContent,
@@ -16,7 +14,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Spinner } from "@/components/package/Spinner";
-import { CirclePlus, PencilRuler, Search, Trash2, UserCircleIcon } from "lucide-react";
+import { CirclePlus, Copy, PencilRuler, ScanQrCode, Search, Trash2, UserCircleIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { SearchBar } from "@/components/SearchBar";
@@ -25,6 +23,10 @@ import { Link } from "react-router-dom";
 import useListManager, { paginationProps } from "@/hooks/useListManager";
 import { showToast } from "@/utils/common";
 import { SortableTableHead } from "@/components/SortableTableHead";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import config from '@/config';
 
 const FormItem = ({ formItem, checkedList, onCheckedItem, onRemoveButton }: {
     formItem: formItemProps,
@@ -55,10 +57,11 @@ const FormItem = ({ formItem, checkedList, onCheckedItem, onRemoveButton }: {
                 <Badge variant="secondary">{dateFormatter(new Date(formItem.started_at))}</Badge>
             </TableCell>
             <TableCell className="font-mono">
-                <Badge variant={`${new Date(formItem.expired_at) < new Date() ? "destructive" : "secondary" }`} >{dateFormatter(new Date(formItem.expired_at))}</Badge>
-            </TableCell>
-            <TableCell className="font-mono">
-                <Badge variant="secondary">{dateFormatter(new Date(formItem.created_at))}</Badge>
+                {formItem.expired_at ? (
+                    <Badge variant={`${new Date(formItem.expired_at) < new Date() ? "destructive" : "secondary" }`} >{dateFormatter(new Date(formItem.expired_at))}</Badge>
+                ) : (
+                    <Badge variant="secondary" >无限期</Badge>
+                )}
             </TableCell>
             <TableCell>
                 <div className="cursor-pointer flex items-center">
@@ -74,7 +77,47 @@ const FormItem = ({ formItem, checkedList, onCheckedItem, onRemoveButton }: {
             </TableCell>
             <TableCell className="text-right">
                 <div className="h-full flex space-x-2">
-                    <PencilRuler className="w-3.5 h-3.5 cursor-pointer" />
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <ScanQrCode className="w-3.5 h-3.5 cursor-pointer" />
+                        </DialogTrigger> 
+                        <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                                <DialogTitle>分享</DialogTitle>
+                                <DialogDescription>
+                                    将表单链接分享到社区、聊天群或者你想的任何人！
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex items-center space-x-2">
+                                <div className="grid flex-1 gap-2">
+                                    <Label htmlFor="link" className="sr-only">
+                                    链接
+                                    </Label>
+                                    <Input
+                                        id="link"
+                                        defaultValue={`${config.APP_BASE_URL}/v/${formItem.id}`}
+                                        readOnly
+                                    />
+                                </div>
+                                <Button type="submit" size="sm" className="px-3">
+                                    <span className="sr-only">复制</span>
+                                    <Copy />
+                                </Button>
+                            </div>
+                            <div className="flex justify-center py-5">
+                                <QRCodeCanvas 
+                                    value={`${config.APP_BASE_URL}/v/${formItem.id}`} // 必填：二维码内容
+                                    size={210}                  // 尺寸（默认 128）
+                                    bgColor="#ffffff"           // 背景色
+                                    fgColor="#000000"           // 前景色
+                                    level="H"                   // 容错等级（L, M, Q, H）
+                                />
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                    <Link to={`/edit/form_id/${formItem.id}`} className="cursor-pointer flex items-center">
+                        <PencilRuler className="w-3.5 h-3.5 cursor-pointer" />
+                    </Link>
                     <IsSure 
                         title="确认删除么？"
                         description="表单删除之后，随之对应的表单数据会一同删除且无法恢复，再次确认，是否需要删除？"
@@ -136,12 +179,8 @@ export const FormList = ({
                             title="过期时间"
                             field="expired_at"
                             onSetSort={onSetSort} />
-                        <SortableTableHead 
-                            title="创建日期"
-                            field="created_at"
-                            onSetSort={onSetSort} />
                         <TableHead>限制数</TableHead>
-                        <TableHead>数据量</TableHead>
+                        <TableHead>填报量</TableHead>
                         <TableHead>操作</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -167,7 +206,7 @@ export const FormList = ({
                                 checked={forms.length != 0 && checkedList.length == forms.length}
                                 onCheckedChange={handleCheckedAll} />
                         </TableCell>
-                        <TableCell colSpan={5}>
+                        <TableCell colSpan={6}>
                             <div className="flex justify-between">
                                 <IsSure 
                                     title="确认删除么？"
@@ -209,10 +248,12 @@ export const FormList = ({
 const TableButtonGroup = () => {
     return (
         <div className="flex items-center justify-end space-x-2">
-            <Button variant="outline" size="sm" className="flex items-center space-x-1 h-8 text-xs">
-                <CirclePlus size="12" />
-                <span>新增</span>
-            </Button>
+            <Link to="/create">
+                <Button variant="outline" size="sm" className="flex items-center space-x-1 h-8 text-xs">
+                    <CirclePlus size="12" />
+                    <span>新增</span>
+                </Button>
+            </Link>
         </div>
     )
 }

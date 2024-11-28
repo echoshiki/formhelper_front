@@ -1,7 +1,8 @@
 import axios from "axios"
 import useAuthStore from "@/stores/AuthStore";
+import config from "@/config"
 
-const baseUrl = "http://webman.lc/app";
+const baseUrl = config.API_BASE_URL;
 const axiosInstance = axios.create({
     baseURL: baseUrl,
     timeout: 10000,

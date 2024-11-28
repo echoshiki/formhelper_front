@@ -137,15 +137,14 @@ const Profile = () => {
 							<Input type="text" className="bg-gray-200 border-none mt-2" value={userInfo.email} disabled />
 						</div>
 
-						<div className="w-full flex space-x-2">
-							<div className="w-1/2">
-								<Label>余额</Label>
-								<Input type="text" className="bg-gray-200 border-none mt-2" value={userInfo.money} disabled />
-							</div>
-							<div className="w-1/2">
-								<Label>积分</Label>
-								<Input type="text" className="bg-gray-200 border-none mt-2" value={userInfo.score} disabled />
-							</div>
+						<div className="w-full">
+							<Label>余额</Label>
+							<Input type="text" className="bg-gray-200 border-none mt-2" value={userInfo.money} disabled />
+						</div>
+
+						<div className="w-full">
+							<Label>积分</Label>
+							<Input type="text" className="bg-gray-200 border-none mt-2" value={userInfo.score} disabled />
 						</div>
 					</div>
 

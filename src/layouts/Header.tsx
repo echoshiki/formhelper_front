@@ -28,7 +28,7 @@ export default function Header({ title }: { title: string }) {
                 <div>
                     <div className="flex items-center space-x-1">
                         <Link to="/test">
-                        <Button className="w-20 h-8 mr-2 text-xs"> 测试 </Button>
+                            <Button className="w-20 h-8 mr-2 text-xs"> 测试 </Button>
                         </Link>
                         <Link to="/create">
                             <Button variant="secondary" className="w-20 h-8 mr-2 text-xs"> 创建表单 </Button>

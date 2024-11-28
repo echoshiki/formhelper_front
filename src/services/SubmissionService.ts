@@ -25,7 +25,7 @@ interface submissionFieldProps {
     id: number,
     label: string,
     value: string,
-    type: string
+    field_type: string
 }
 
 interface getSubmissionListProps {
@@ -107,7 +107,7 @@ class SubmissionService {
         }   
     }
 
-    // 获取提交数据列表
+    // 获取提交数据的详情
     async getSubmissionView({ id }: getSubmissionViewProps) {
         try {
             const response = await axiosInstance.get(`/formhelper/submission/view`, {
