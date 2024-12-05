@@ -1,68 +1,49 @@
-import React from 'react';
-import { DragDropContext, Draggable } from 'react-beautiful-dnd';
-import { StrictModeDroppable as Droppable } from '@/components/StrictModeDroppable'
+import { create } from "zustand"
 
-// 示例字段数据
-const initialFields = [
-    { id: '1', label: '姓名' },
-    { id: '2', label: '年龄' },
-    { id: '3', label: '手机号码' },
-];
+interface testStoreProps {
+    labelText: string,
+    setLabelText: (text: string) => void,
+    alertText: string,
+    setAlertText: (text: string) => void,
+    handleClick: () => void,
+}
 
-const DraggableFields = () => {
-    const [formFields, setFormFields] = React.useState(initialFields);
+const useTestStore = create<testStoreProps>(set => ({
+    labelText: "",
+    setLabelText: (text: string) => set({
+        labelText: text
+    }),
+    alertText: "",
+    setAlertText: (text: string) => set({
+        alertText: text
+    }),
+    // 错误：state 上下文是由 set() 方法管理的
+    // handleClick: (state: any) => {
+    //     alert(state.alertText);
+    // }
+    handleClick: () => {
+        const state = useTestStore.getState();
+        alert(state.alertText);
+    }
+}))
 
-    // 处理拖拽完成事件
-    const handleDragEnd = (result: any) => {
-        // 解构出原位置与目标位置的对象（index）
-        const { source, destination } = result;
+const A = () => {
+    const setLabelText = useTestStore((state) => state.setLabelText);
+    setLabelText('从 A 组件传来的 Label 值');
+    return <B />
+}
 
-        // 如果没有目标位置，直接返回
-        if (!destination) return;
+const B = () => {
+    const setAlertText = useTestStore((state) => state.setAlertText);
+    setAlertText('从 B 组件传来的 Alert 值');
+    return <C />
+}
 
-        // 通过将原位置（source）删除的数组元素插入到目标位置（destination）组成新的数组来实现重新排序字段
-        // 因为需要改变数组，所以创建一个状态量 formFields 的副本
-        const reorderedFields = Array.from(formFields);
-        // splice() 方法删除数组的元素，source.index 开始，1 为删除个数
-        // 返回被删除的元素数组（可能为多个）
-        // 数组解构，将剔除的元素返回赋值给 movedField
-        const [movedField] = reorderedFields.splice(source.index, 1);
-        // 向指定索引的地方插入元素（moveField），0 表示不删除任何元素
-        reorderedFields.splice(destination.index, 0, movedField);
+const C = () => {
+    const labelText = useTestStore((state) => state.labelText);
+    const handleClick = useTestStore((state) => state.handleClick);
 
-        // 更新原数组状态量
-        setFormFields(reorderedFields);
-    };
+    return <button onClick={handleClick}>{labelText}</button>
+}
 
-    return (
-        <DragDropContext onDragEnd={handleDragEnd}>
-            <Droppable droppableId="f1">
-                {(provided) => (
-                    <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="space-y-2"
-                    >
-                        {formFields.map((field, index) => (
-                            <Draggable key={field.id} draggableId={field.label} index={index}>
-                                {(provided) => (
-                                    <div
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                        className="flex items-center space-x-4 p-2 bg-gray-100 border rounded"
-                                    >
-                                        <span className="font-medium">{field.label}</span>
-                                    </div>
-                                )}
-                            </Draggable>
-                        ))}
-                        {provided.placeholder}
-                    </div>
-                )}
-            </Droppable>
-        </DragDropContext>
-    );
-};
-
-export default DraggableFields;
+export default A;

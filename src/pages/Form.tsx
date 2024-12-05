@@ -26,6 +26,7 @@ import { SortableTableHead } from "@/components/SortableTableHead";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import config from '@/config';
 
 const FormItem = ({ formItem, checkedList, onCheckedItem, onRemoveButton }: {
@@ -34,6 +35,7 @@ const FormItem = ({ formItem, checkedList, onCheckedItem, onRemoveButton }: {
     onCheckedItem: (id: number) => void,
     onRemoveButton: (id: number[]) => void,
 }) => {
+    const [copySuccess, setCopySuccess] = useState(false);
     return (
         <TableRow>
             <TableCell>
@@ -99,10 +101,20 @@ const FormItem = ({ formItem, checkedList, onCheckedItem, onRemoveButton }: {
                                         readOnly
                                     />
                                 </div>
-                                <Button type="submit" size="sm" className="px-3">
-                                    <span className="sr-only">复制</span>
-                                    <Copy />
-                                </Button>
+                                <CopyToClipboard 
+                                    text={`${config.APP_BASE_URL}/v/${formItem.id}`}
+                                    onCopy={() => setCopySuccess(true)}
+                                >
+                                    <Button size="sm" className="px-3">
+                                        {copySuccess ? <span>已复制</span> : (
+                                            <>
+                                                <span className="sr-only">复制</span>
+                                                <Copy />
+                                            </>
+                                        )}  
+                                    </Button>
+                                </CopyToClipboard>
+                                
                             </div>
                             <div className="flex justify-center py-5">
                                 <QRCodeCanvas 
@@ -148,6 +160,7 @@ export const FormList = ({
     onSetSort 
 }: formListProps) => {
     const [checkedList, setCheckedList] = useState<number[]>([]);
+
     const handleCheckedItem = (id: number) => {
         setCheckedList(prev => (
             prev.includes(id)
@@ -155,6 +168,7 @@ export const FormList = ({
                 : [...prev, id]
         ))
     }
+
     const handleCheckedAll = () => {
         // 返回包含所有页面数据 id 的数组
         setCheckedList(prev => (
@@ -163,6 +177,8 @@ export const FormList = ({
                 : []
         ));
     }
+
+    
 
     return (
         <>

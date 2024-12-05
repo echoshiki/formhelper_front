@@ -42,6 +42,7 @@ export interface formBaseProps {
 }
 
 export interface formFieldsProps {
+    id: string,
     label: string,
     field_type: string,
     options: string[],

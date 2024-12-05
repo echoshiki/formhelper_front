@@ -12,6 +12,7 @@ import Edit from '@/pages/Edit';
 import Test from '@/pages/Test';
 import Submission from '@/pages/Submission';
 import SubmissionView from '@/pages/SubmissionView';
+import View from '@/pages/View';
 
 interface privateRouteProps {
 	element: React.ReactNode,
@@ -30,6 +31,7 @@ function App() {
 			<MessageHandler />
 			<Routes>
 				<Route path="/login" element={currentUser ? <Navigate to="/" /> : <Login />} />
+
 				<Route path="/" element={<PrivateRoute element={<Home />} currentUser={currentUser} />} />
 				<Route path="/profile" element={<PrivateRoute element={<Profile />} currentUser={currentUser} />} />
 				<Route path="/forms" element={<PrivateRoute element={<Form />} currentUser={currentUser} />} />
@@ -37,6 +39,8 @@ function App() {
 				<Route path="/edit/form_id/:form_id" element={<PrivateRoute element={<Edit />} currentUser={currentUser} />} />
 				<Route path="/submissions/form_id/:form_id" element={<PrivateRoute element={<Submission />} currentUser={currentUser} />} />
 				<Route path="/submissions/:id" element={<PrivateRoute element={<SubmissionView />} currentUser={currentUser} />} />
+				
+				<Route path="/v/:id" element={<View />} />
 				<Route path="/test" element={<Test />} />
 			</Routes>
 		</RootLayout>

@@ -98,13 +98,19 @@ const FieldsPanel = ({formFields, onRemoveField, onDragEnd}: FieldsPanelProps) =
 											{...provided.dragHandleProps}
 											className="w-full cursor-pointer group hover:border hover:border-dashed rounded hover:p-5 hover:py-2 ease-in-out transition-all flex items-center justify-between mt-2"
 										>
-											<DynamicInput 
-												name={item.label}
-												type={item.field_type}
-												label={item.label}
-												options={item.options}
-												required={item.required}
-											/>
+											<div className="w-full" key={key}>
+												<Label className=" text-slate-600">
+													{item.label}{item.required ? <span className="text-red-500">{` * `}</span> : ''}
+												</Label>
+												<DynamicInput 
+													name={item.label}
+													type={item.field_type}
+													options={item.options}
+													required={item.required}
+													readOnly={true} 
+												/>
+											</div>
+
 											<div className="hidden group-hover:flex flex-wrap justify-center items-center" onClick={() => onRemoveField(key)}>
 												<span className="text-xs">删除</span>
 												<SquareX strokeWidth={1} fill="black" color="white" size="32" />
