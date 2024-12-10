@@ -29,7 +29,7 @@ import { useEffect, useState } from "react";
 import FormService, { formActionProps, formBaseProps, formFieldsProps } from "@/services/FormService";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/package/Spinner";
-import DynamicInput from "@/components/DynamicInput";
+import DynamicInput from "./DynamicInput";
 
 /**
  * 组件：自定义字段选项
@@ -55,69 +55,6 @@ const OptionItem = ({ value, index, onRemoveOption, onChangeOption }: OptionProp
 				placeholder="选项"
 				value={value}
 				onChange={e => onChangeOption(index, e.target.value)} />
-		</div>
-	)
-}
-
-/**
- * 组件：自定义字段列表
- * @description 展示已经添加的字段组成的列表预览
- * @param fields 已经添加进状态量的字段
- * @param onRemoveField 删除状态量里的当前字段
- * @param onDragEnd 处理拖拽完成事件
- */
-
-interface FieldsPanelProps {
-	formFields: formFieldsProps[],
-	onRemoveField: (index: number) => void,
-	onDragEnd: (result: any) => void
-}
-
-const FieldsPanel = ({formFields, onRemoveField, onDragEnd}: FieldsPanelProps) => {
-
-	return (
-		<div className="mt-5 flex flex-wrap space-y-3 border p-5 md:p-8 rounded">
-			<p className="flex items-center text-slate-600 text-xs">
-				<FileText size="12" />&nbsp;表单示例
-			</p>
-			<DragDropContext onDragEnd={onDragEnd}>
-				<Droppable droppableId="fields">
-					{(provided) => (
-						<div
-							{...provided.droppableProps}
-							ref={provided.innerRef}
-							className="w-full"
-						>
-							{formFields.map((item: formFieldsProps, key: number) => (
-								<Draggable key={item.label + key} draggableId={item.label + key} index={key}>
-									{(provided) => (
-										<div
-											key={key}
-											ref={provided.innerRef}
-											{...provided.draggableProps}
-											{...provided.dragHandleProps}
-											className="w-full cursor-pointer group hover:border hover:border-dashed rounded hover:p-5 hover:py-2 ease-in-out transition-all flex items-center justify-between mt-2"
-										>
-											<DynamicInput 
-												name={item.label}
-												type={item.field_type}
-												label={item.label}
-												options={item.options}
-												required={item.required}
-											/>
-											<div className="hidden group-hover:flex flex-wrap justify-center items-center" onClick={() => onRemoveField(key)}>
-												<span className="text-xs">删除</span>
-												<SquareX strokeWidth={1} fill="black" color="white" size="32" />
-											</div>
-										</div>
-									)}
-								</Draggable>
-							))}
-							{provided.placeholder}
-						</div>
-					)}
-				</Droppable>
-			</DragDropContext>
 		</div>
 	)
 }
@@ -233,6 +170,7 @@ const FieldsDrawer = ({ onAddField }: FieldsDrawerProps) => {
 		if (field.field_type === "checkbox" && field.options.every(option => !option.trim())) {
 			newFieldErrors.options = "至少填写一个有效的选项";
 		}
+		
 		setFieldErrors(newFieldErrors);
 		return Object.keys(newFieldErrors).length === 0;
 	}
@@ -280,6 +218,7 @@ const FieldsDrawer = ({ onAddField }: FieldsDrawerProps) => {
 								</Select>
 								{fieldErrors.field_type && <p className="text-red-500 text-sm mt-1">{fieldErrors.field_type}</p>}
 							</div>
+							
 							{(field.field_type === 'checkbox' || field.field_type === 'select') && (
 								<div className="w-full">
 									<Label>选项设置</Label>
@@ -298,6 +237,7 @@ const FieldsDrawer = ({ onAddField }: FieldsDrawerProps) => {
 									</Button>
 								</div>
 							)}
+
 							<div className="w-full flex items-center space-x-5 py-5">
 								<div>
 									<Label>是否必填</Label>
@@ -317,6 +257,76 @@ const FieldsDrawer = ({ onAddField }: FieldsDrawerProps) => {
 					</div>
 				</DrawerContent>
 			</Drawer>
+		</div>
+	)
+}
+
+/**
+ * 组件：自定义字段列表
+ * @description 展示已经添加的字段组成的列表预览
+ * @param fields 已经添加进状态量的字段
+ * @param onRemoveField 删除状态量里的当前字段
+ * @param onDragEnd 处理拖拽完成事件
+ */
+
+interface FieldsPanelProps {
+	formFields: formFieldsProps[],
+	onRemoveField: (index: number) => void,
+	onDragEnd: (result: any) => void
+	onFieldRequired: (checked: boolean, name: string) => void,
+}
+
+const FieldsPanel = ({formFields, onRemoveField, onDragEnd, onFieldRequired}: FieldsPanelProps) => {
+
+	return (
+		<div className="mt-5 flex flex-wrap space-y-3 border p-5 md:p-8 rounded">
+			<p className="flex items-center text-slate-600 text-xs">
+				<FileText size="12" />&nbsp;表单示例
+			</p>
+			<DragDropContext onDragEnd={onDragEnd}>
+				<Droppable droppableId="fields">
+					{(provided) => (
+						<div
+							{...provided.droppableProps}
+							ref={provided.innerRef}
+							className="w-full"
+						>
+							{formFields.map((item: formFieldsProps, key: number) => (
+								<Draggable key={item.label + key} draggableId={item.label + key} index={key}>
+									{(provided) => (
+										<div
+											key={key}
+											ref={provided.innerRef}
+											{...provided.draggableProps}
+											{...provided.dragHandleProps}
+											className="w-full cursor-pointer group hover:border hover:border-dashed rounded hover:p-5 hover:py-2 ease-in-out transition-all flex items-center justify-between mt-2"
+										>
+											<DynamicInput 
+												name={item.id}
+												type={item.field_type}
+												label={item.label}
+												options={item.options}
+												required={item.required}
+											/>
+											<div className="flex pl-5">
+												<div className="hidden group-hover:flex flex-wrap justify-center">
+													<span className="text-xs">必填</span>
+													<Switch checked={item.required} onCheckedChange={e => onFieldRequired(e, item.id)} />
+												</div>
+												<div className="hidden group-hover:flex flex-wrap justify-center" onClick={() => onRemoveField(key)}>
+													<span className="text-xs">删除</span>
+													<SquareX strokeWidth={1} fill="black" color="white" size="32" />
+												</div>
+											</div>
+										</div>
+									)}
+								</Draggable>
+							))}
+							{provided.placeholder}
+						</div>
+					)}
+				</Droppable>
+			</DragDropContext>
 		</div>
 	)
 }
@@ -394,6 +404,21 @@ const DynamicForm = ({ id, onActionForm }: DynamicFormProps) => {
 		const nextFormFields = formFields.filter((_, key) => key != index);
 		setFormFields(nextFormFields);
 	};
+
+	// 处理字段选择是否必填
+	const handleFieldRequired = (checked: boolean, name: string) => {
+		const nextFormFields = formFields.map(field => {
+			if (field.id == name) {
+				return {
+					...field,
+					required: checked
+				}
+			} else {
+				return field;
+			}
+		});
+		setFormFields(nextFormFields);
+	}
 
 	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		const { name, value } = event.target;
@@ -521,9 +546,12 @@ const DynamicForm = ({ id, onActionForm }: DynamicFormProps) => {
 				</CardHeader>
 				<CardContent>
 					<FieldsDrawer onAddField={handleAddField} />
-					<FieldsPanel formFields={formFields} 
+					<FieldsPanel 
+						formFields={formFields} 
 						onRemoveField={handRemoveField}
-						onDragEnd={handleDragEnd} />
+						onDragEnd={handleDragEnd} 
+						onFieldRequired={handleFieldRequired}
+					/>
 					{formErrors.formFields && (
 						<p className="text-red-500 text-sm mt-1">{formErrors.formFields}</p>
 					)}
@@ -546,7 +574,7 @@ const DynamicForm = ({ id, onActionForm }: DynamicFormProps) => {
 									<Input type="text"
 										name="started_at"
 										className="bg-gray-100 border-none mt-2"
-										value={formBase.started_at}
+										value={formBase.started_at ?? ""}
 										onChange={handleInputChange} />
 								</PopoverTrigger>
 								<PopoverContent className="w-auto p-0" align="start">
@@ -567,7 +595,7 @@ const DynamicForm = ({ id, onActionForm }: DynamicFormProps) => {
 									<Input type="text"
 										name="expired_at"
 										className="bg-gray-100 border-none mt-2"
-										value={formBase.expired_at}
+										value={formBase.expired_at ?? ""}
 										onChange={handleInputChange} />
 								</PopoverTrigger>
 								<PopoverContent className="w-auto p-0" align="start">

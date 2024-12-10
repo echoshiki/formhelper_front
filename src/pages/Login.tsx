@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label"
 import useAuthStore from "@/stores/AuthStore"
 import { useState, useEffect } from "react"
 import { useToast } from "@/components/ui/use-toast"
+import { useLocation, useNavigate } from "react-router-dom"
 
 export default () => {
 
@@ -22,7 +23,10 @@ export default () => {
 
     const { captchaLabel, login, fetchCaptcha } = useAuthStore();
     const { toast } = useToast();
-    
+
+    const location = useLocation();
+	const navigate = useNavigate();
+  
     useEffect(() => {
         fetchCaptcha("login");
     }, []);
@@ -53,7 +57,9 @@ export default () => {
             return;
         }
         try {
-            await login({username, password, captcha: captchaInput});         
+            await login({username, password, captcha: captchaInput});
+            const from = location.state?.from ? location.state?.from : '/';
+            navigate(from);
         } catch (e) {
             toast({
                 variant: "destructive",

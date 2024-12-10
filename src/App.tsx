@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { currentUserProps } from '@/services/AuthService';
 import useAuthStore from '@/stores/AuthStore';
 import RootLayout from '@/layouts/RootLayout';
@@ -20,7 +20,12 @@ interface privateRouteProps {
 }
 
 function PrivateRoute({ element, currentUser }: privateRouteProps) {
-	return currentUser ? element : <Navigate to="/login" />
+	const location = useLocation();
+	return currentUser ? (
+		element 
+	): (
+		<Navigate to="/login" state={{ from: location.pathname }} />
+	);
 }
 
 function App() {
@@ -31,7 +36,7 @@ function App() {
 			<MessageHandler />
 			<Routes>
 				<Route path="/login" element={currentUser ? <Navigate to="/" /> : <Login />} />
-
+				{/* 登录检测 */}
 				<Route path="/" element={<PrivateRoute element={<Home />} currentUser={currentUser} />} />
 				<Route path="/profile" element={<PrivateRoute element={<Profile />} currentUser={currentUser} />} />
 				<Route path="/forms" element={<PrivateRoute element={<Form />} currentUser={currentUser} />} />
@@ -39,7 +44,7 @@ function App() {
 				<Route path="/edit/form_id/:form_id" element={<PrivateRoute element={<Edit />} currentUser={currentUser} />} />
 				<Route path="/submissions/form_id/:form_id" element={<PrivateRoute element={<Submission />} currentUser={currentUser} />} />
 				<Route path="/submissions/:id" element={<PrivateRoute element={<SubmissionView />} currentUser={currentUser} />} />
-				
+				{/* 直接访问 */}
 				<Route path="/v/:id" element={<View />} />
 				<Route path="/test" element={<Test />} />
 			</Routes>

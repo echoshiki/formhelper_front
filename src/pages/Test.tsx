@@ -1,49 +1,36 @@
-import { create } from "zustand"
+import { useForm, SubmitHandler } from "react-hook-form"
 
-interface testStoreProps {
-    labelText: string,
-    setLabelText: (text: string) => void,
-    alertText: string,
-    setAlertText: (text: string) => void,
-    handleClick: () => void,
+type Inputs = {
+  example: string
+  exampleRequired: string
 }
 
-const useTestStore = create<testStoreProps>(set => ({
-    labelText: "",
-    setLabelText: (text: string) => set({
-        labelText: text
-    }),
-    alertText: "",
-    setAlertText: (text: string) => set({
-        alertText: text
-    }),
-    // 错误：state 上下文是由 set() 方法管理的
-    // handleClick: (state: any) => {
-    //     alert(state.alertText);
-    // }
-    handleClick: () => {
-        const state = useTestStore.getState();
-        alert(state.alertText);
-    }
-}))
+export default function App() {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<Inputs>();
 
-const A = () => {
-    const setLabelText = useTestStore((state) => state.setLabelText);
-    setLabelText('从 A 组件传来的 Label 值');
-    return <B />
+  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+
+
+  console.log(watch("example")) // 监听字段框的输入
+
+
+  return (
+    /* 在提交前用 handleSubmit 验证表单字段 */
+    <form onSubmit={handleSubmit(onSubmit)}>
+      {/* 将表单的字段通过 register 方法进行注册 */}
+      <input defaultValue="test" {...register("example")} />
+
+      {/* 包含了字段验证规则 required */}
+      <input {...register("exampleRequired", { required: true })} />
+      {/* 如果验证失败则 return false  */}
+      {errors.exampleRequired && <span>This field is required</span>}
+
+      <input type="submit" />
+    </form>
+  )
 }
-
-const B = () => {
-    const setAlertText = useTestStore((state) => state.setAlertText);
-    setAlertText('从 B 组件传来的 Alert 值');
-    return <C />
-}
-
-const C = () => {
-    const labelText = useTestStore((state) => state.labelText);
-    const handleClick = useTestStore((state) => state.handleClick);
-
-    return <button onClick={handleClick}>{labelText}</button>
-}
-
-export default A;
