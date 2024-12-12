@@ -39,6 +39,7 @@ export interface formBaseProps {
     single: boolean,
     logged: boolean,
     disabled: boolean,
+    count?: number
 }
 
 export interface formFieldsProps {
@@ -52,7 +53,7 @@ export interface formFieldsProps {
 }
 
 class FormService {
-    
+      
     /**
      * 接口服务：获取表单列表
      * @description 获取表单列表数据
@@ -63,11 +64,13 @@ class FormService {
      * @param {string} sort_order 排序规则
      * @param {string} search 搜索关键词
      */
-
     async getFormList(params: getFormListProps) {
         try {
             // 直接解构出 response.data 重命名成 responseData
-            const { data: responseData } = await axiosInstance.get(`/formhelper/form/list`, { params });
+            const { data: responseData } = await axiosInstance.get(
+                `/formhelper/form/list`, { 
+                params 
+            });
             const { code, msg, data } = responseData;
             return code === 0
                 ? { code: 200, msg: msg, data: data }
@@ -85,10 +88,12 @@ class FormService {
      * @description 删除选定表单
      * @param ids 选定表单的 id 集
      */
-
     async removeFormSelected(ids: number[]) {
         try {
-            const { data: { code, msg } } = await axiosInstance.post(`/formhelper/form/deleteSelected`, { ids });
+            const { data: { code, msg } } = await axiosInstance.post(
+                `/formhelper/form/deleteSelected`, { 
+                ids 
+            });
             return {
                 code: code === 0 ? 200 : 500,
                 msg: msg
@@ -106,10 +111,10 @@ class FormService {
      * @description 获取表单的结构详情
      * @param id 表单 id
      */
-
     async getFormView(id: string) {
         try {
-            const { data: { code, msg, data } } = await axiosInstance.get(`/formhelper/form/view`, {
+            const { data: { code, msg, data } } = await axiosInstance.get(
+                `/formhelper/form/view`, {
                 params: { id }
             });
             return code == 0 ? {
@@ -135,10 +140,10 @@ class FormService {
      * @param formBase 表单的基础信息
      * @param formFields 表单的自定义字段信息
      */
-
     async createForm({ formBase, formFields }: formActionProps) {
         try {
-            const { data: { code, msg } } = await axiosInstance.post(`/formhelper/form/create`, {
+            const { data: { code, msg } } = await axiosInstance.post(
+                `/formhelper/form/create`, {
                 formBase,
                 formFields
             });
@@ -164,10 +169,10 @@ class FormService {
      * @param formBase 表单的基础信息
      * @param formFields 表单的自定义字段信息
      */
-
     async editForm ({ formBase, formFields }: formActionProps) {
         try {
-            const { data: { code, msg } } = await axiosInstance.post(`/formhelper/form/edit`, {
+            const { data: { code, msg } } = await axiosInstance.post(
+                `/formhelper/form/edit`, {
                 formBase,
                 formFields
             });

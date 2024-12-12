@@ -14,6 +14,8 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { showToast } from "@/utils/common";
 import { Spinner } from "@/components/package/Spinner";
+import SubmissionService, { createSubmissionFieldsProps } from "@/services/SubmissionService";
+import travel from "@/assets/travel.svg";
 
 const View = () => {
 
@@ -31,6 +33,7 @@ const View = () => {
         single: false,
         logged: false,
         disabled: false,
+        count: 0,
     });
     // 字段信息
     let formFields = useRef<formFieldsProps[]>([]);
@@ -39,6 +42,7 @@ const View = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { currentUser } = useAuthStore();
+    
     if (formBase.current.logged && currentUser === null) {
         // 检测登陆情况
         navigate('/login', {
@@ -47,6 +51,8 @@ const View = () => {
             }
         });
     }
+
+    const [submitted, setSubmitted] = useState(false);
 
     // 字段输入状态
     const [formFieldValues, setFormFieldValues] = useState<{[key: string]: any}>({});
@@ -59,9 +65,17 @@ const View = () => {
         setLoading(true);
         try {
             const { data: responseData } = await FormService.getFormView(id);
-            formBase.current = responseData.base;
-            formFields.current = responseData.fields;
 
+            // 检测是否限填一次
+            if (responseData.base.count > 0 && responseData.base.single) {
+                setSubmitted(true);
+                setLoading(false);
+                return false;
+            }
+
+            formBase.current = responseData.base;
+            formFields.current = responseData.fields;   
+            
             // 初始化用户输入值
             const initialValues = responseData.fields.reduce((acc: any, field: any) => {
                 acc[field.id] = ''; // 设置默认值
@@ -87,30 +101,61 @@ const View = () => {
         })
     }
 
-    const handleSubmit = () => {
-        
-        const fieldsComplete = formFields.current.map(item => {
-            // 筛查必填项
+    const handleSubmit = async () => {
+
+        // 为传递数据新构造一个对应结构的数组
+        const fieldsComplete: createSubmissionFieldsProps[] = [];
+
+        // 检测验证
+        for (const item of formFields.current) {
             if (item.required && !formFieldValues[item.id]) {
                 showToast(`${item.label} 是必填项！`);
-                return false;
-            }
-            // 将填写值赋值进字段数组
-            return {
+                // 清空数组
+                fieldsComplete.splice(0, fieldsComplete.length);
+                break;
+            } 
+            fieldsComplete.push({
                 ...item,
-                value: formFieldValues[item.id] || null
-            };
+                value:  formFieldValues[item.id]
+            });
+        }
+
+        if (fieldsComplete.length  == 0) 
+            return false;
+
+        // 提交数据
+        const response = await SubmissionService.createSubmission({ 
+            form_id: id, 
+            fields: fieldsComplete 
         });
-    
-        // 提交
-        console.log(fieldsComplete); // 打印合并后的字段数组
+        showToast(`${response.msg}`, response.code === 200 ? 1 : 2);
+        // 跳转页面
+        response.code == 200 && setSubmitted(true);
     };
+
+    const SuccessMessage = () => {
+        return (
+            <Card className="w-72 md:w-auto mx-auto px-10 py-20 h-full flex items-center">
+                <div className="text-center w-full">
+                    <div className="flex justify-center mb-10">
+                        <img src={travel} className="w-72" />
+                    </div>
+                    <h1 className="text-3xl font-bold mt-2">提交成功</h1>
+                    <p className="text-sm font-light mt-3 text-slate-500">太好了，我们很快就会收到您的提交</p>
+                    <Button className="mt-10" onClick={() => navigate('/')}>返回首页</Button>
+                </div>
+            </Card>
+        );
+    }
 
     return (
         <>
-        {loading ? (
-            <Spinner />
-        ) : (
+        {/* 载入数据 */}
+        {loading && <Spinner />}
+        {/* 提交后页面 */}
+        {!loading && submitted && <SuccessMessage />}
+        {/* 表单页面 */}
+        {!loading && !submitted && (
             <Card className="w-72 md:w-auto mx-auto pt-2 pb-4">
                 <CardHeader>
                     <CardTitle className="text-2xl">{formBase.current.title}</CardTitle>
@@ -136,8 +181,8 @@ const View = () => {
                     <Button className="w-full" onClick={handleSubmit}>立即提交</Button>
                 </CardFooter>
             </Card>
-        )}
-        </>  
+        )} 
+        </>
     );
 }
 

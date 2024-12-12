@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/drawer";
 import { CopyPlusIcon, FileText, ListXIcon, SquareX } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
 import { DragDropContext, Draggable } from 'react-beautiful-dnd';
 // 修复严格模式下出现的拖拽问题
 import { StrictModeDroppable as Droppable } from '@/components/StrictModeDroppable'
@@ -30,6 +29,7 @@ import FormService, { formActionProps, formBaseProps, formFieldsProps } from "@/
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/package/Spinner";
 import DynamicInput from "./DynamicInput";
+import { showToast } from "@/utils/common";
 
 /**
  * 组件：自定义字段选项
@@ -365,7 +365,6 @@ const DynamicForm = ({ id, onActionForm }: DynamicFormProps) => {
 
 	// 载入状态
     const [loading, setLoading] = useState(false); 
-	const { toast } = useToast();
 	const navigate = useNavigate();
 
 	// 错误信息
@@ -374,12 +373,19 @@ const DynamicForm = ({ id, onActionForm }: DynamicFormProps) => {
 	// 验证字段填写
 	const validateForm = (): boolean => {
 		const newFormErrors: { [key: string]: string } = {};
+
 		if (!formBase.title.trim()) {
 			newFormErrors.title = "标题不能为空";
 		}
+		
 		if (formFields.every(option => !option)) {
 			newFormErrors.formFields = "至少添加一个有效的填写项";
 		}
+
+		if (formFields.every(option => !option.required)) {
+			newFormErrors.formFields = "至少添加一个必填项";
+		}
+
 		setFormErrors(newFormErrors);
 		return Object.keys(newFormErrors).length === 0;
 	}
@@ -407,19 +413,17 @@ const DynamicForm = ({ id, onActionForm }: DynamicFormProps) => {
 
 	// 处理字段选择是否必填
 	const handleFieldRequired = (checked: boolean, name: string) => {
-		const nextFormFields = formFields.map(field => {
-			if (field.id == name) {
-				return {
-					...field,
-					required: checked
-				}
-			} else {
-				return field;
-			}
-		});
+		const nextFormFields = formFields.map(field => (
+			//  根据 name 找出需要更改 required 的字段
+			field.id === name ? ({
+				...field,
+				required: checked
+			}) : field
+		));
 		setFormFields(nextFormFields);
 	}
 
+	// 处理输入框
 	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		const { name, value } = event.target;
 		setFormBase({
@@ -428,18 +432,17 @@ const DynamicForm = ({ id, onActionForm }: DynamicFormProps) => {
 		});
 	};
 
+	// 处理日期输入框
 	const handleDateSelect = (field: 'started_at' | 'expired_at', selectedDate: Date | undefined) => {
-		if (selectedDate) {
-			const formattedDate = dateFormatter(selectedDate);
-			setFormBase({
-				...formBase,
-				[field]: formattedDate,
-			});
-		}
+		selectedDate && setFormBase({
+			...formBase,
+			[field]: dateFormatter(selectedDate),
+		});
 		// 关闭弹窗
 		togglePopOpen(field, false);
 	};
 
+	// 处理多选框
 	const handleCheckedChange = (checked: boolean, name: string) => {
 		setFormBase({
 			...formBase,
@@ -484,19 +487,9 @@ const DynamicForm = ({ id, onActionForm }: DynamicFormProps) => {
 		formFields.map((field, index) => field.sort = index + 1);
 		// 调用服务
 		const response = await onActionForm({formBase, formFields});
-		
-		if (response.code == 200) {
-			toast({
-				title: "提示",
-				description: response.msg,
-			});
-			response.url && navigate(response.url);
-		} else {
-			toast({
-				title: "提示",
-				description: response.msg,
-			});
-		}
+
+		showToast(response.msg);
+		response.code == 200 && response.url && navigate(response.url);
 	}
 
 	return (
@@ -623,20 +616,22 @@ const DynamicForm = ({ id, onActionForm }: DynamicFormProps) => {
 					<div className="flex flex-wrap space-y-2 mt-5">
 						<div className="w-full border rounded-lg px-5 py-5 flex items-center justify-between">
 							<div>
-								<Label>限填一次</Label>
-								<p className="text-xs text-slate-500">单个用户在此次表单中是否只能填报一次。</p>
-							</div>
-							<Switch checked={formBase.single}
-								onCheckedChange={e => handleCheckedChange(e, 'single')} />
-						</div>
-						<div className="w-full border rounded-lg px-5 py-5 flex items-center justify-between">
-							<div>
 								<Label>需要登录</Label>
 								<p className="text-xs text-slate-500">是否要求用户登录后填报此表单。</p>
 							</div>
 							<Switch checked={formBase.logged}
 								onCheckedChange={e => handleCheckedChange(e, 'logged')} />
 						</div>
+						{formBase.logged ? (
+							<div className="w-full border rounded-lg px-5 py-5 flex items-center justify-between">
+								<div>
+									<Label>限填一次</Label>
+									<p className="text-xs text-slate-500">单个用户在此次表单中是否只能填报一次。</p>
+								</div>
+								<Switch checked={formBase.single}
+									onCheckedChange={e => handleCheckedChange(e, 'single')} />
+							</div>
+						) : ""}
 					</div>
 				</CardContent>
 			</Card>

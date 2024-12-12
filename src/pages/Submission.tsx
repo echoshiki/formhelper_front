@@ -19,7 +19,7 @@ import { Spinner } from "@/components/package/Spinner";
 
 interface submissionListProps {
     items: submissionItemProps[],
-    onRemoveSelected: (ids: number[]) => void,
+    onRemoveSelected: (ids: string[]) => void,
     pagination: paginationProps,
     onSetPage: (page: number) => void,
     onSetPageSize: (pageSize: number) => void,
@@ -34,8 +34,8 @@ const SubmissionList = ({
     onSetPageSize,
     onSetSort
 }: submissionListProps) => {
-    const [checkedList, setCheckedList] = useState<number[]>([]);
-    const handleCheckedItem = (id: number) => {
+    const [checkedList, setCheckedList] = useState<string[]>([]);
+    const handleCheckedItem = (id: string) => {
         setCheckedList(prev => (
             prev.includes(id)
                 ? prev.filter(item => item !== id)
@@ -165,7 +165,7 @@ const Submission = () => {
         handleSetSort
     } = useListManager<submissionItemProps>(SubmissionService.getSubmissionList, { form_id: form_id });
     
-    const handleRemoveSelected = async (ids: number[]) => {
+    const handleRemoveSelected = async (ids: string[]) => {
         if (ids.length === 0) {
             showToast('请选择需要删除的项目。', 2);
             return false;

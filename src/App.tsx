@@ -13,6 +13,7 @@ import Test from '@/pages/Test';
 import Submission from '@/pages/Submission';
 import SubmissionView from '@/pages/SubmissionView';
 import View from '@/pages/View';
+import NotFound from '@/pages/404';
 
 interface privateRouteProps {
 	element: React.ReactNode,
@@ -46,6 +47,7 @@ function App() {
 				<Route path="/submissions/:id" element={<PrivateRoute element={<SubmissionView />} currentUser={currentUser} />} />
 				{/* 直接访问 */}
 				<Route path="/v/:id" element={<View />} />
+				<Route path="/404" element={<NotFound />} />
 				<Route path="/test" element={<Test />} />
 			</Routes>
 		</RootLayout>

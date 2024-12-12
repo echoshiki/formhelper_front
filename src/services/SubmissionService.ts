@@ -2,15 +2,15 @@ import axiosInstance from "@/utils/axiosInstance";
 
 // 导出返回的提交数据项结构类型
 export interface submissionItemProps {
-    id: number,
-    user_id: number,
+    id: string,
+    user_id: string,
     user: {
         username: string,
     },
     form: {
         title: string,
-    }
-    form_id: number,
+    },
+    form_id: string,
     submitted_at: string
 }
 
@@ -22,10 +22,11 @@ export interface submissionViewProps {
 }
 
 interface submissionFieldProps {
-    id: number,
+    id: string,
     label: string,
-    value: string,
-    field_type: string
+    field_type: string,
+    sort: number,
+    value: any
 }
 
 interface getSubmissionListProps {
@@ -37,43 +38,41 @@ interface getSubmissionListProps {
     search: string,
 }
 
-interface getSubmissionViewProps {
-    id: number
+// 提交数据的字段属性
+export interface createSubmissionFieldsProps extends submissionFieldProps {
+    required: boolean,
+    options: string[]
+}
+
+// 提交数据
+interface createSubmissionProps {
+    form_id: string,
+    fields: createSubmissionFieldsProps[]
 }
 
 class SubmissionService {
 
-    // 获取提交数据列表
-    async getSubmissionList({
-        form_id, 
-        page, 
-        page_size, 
-        sort_field, 
-        sort_order, 
-        search
-    }: getSubmissionListProps) {
+    /**
+     * 接口服务：获取提交数据详情
+     * @description 获取指定 id 的提交数据详情
+     * @param {getSubmissionListProps} params 参数集
+     * @param {string} form_id 表单的 id
+     * @param {string} page 当前页
+     * @param {string} page_size 每页显示数据量
+     * @param {string} sort_field 排序字段
+     * @param {string} sort_order 排序规则
+     * @param {string} search 搜索关键词
+     */
+    async getSubmissionList(params: getSubmissionListProps) {
         try {
-            const response = await axiosInstance.get(`/formhelper/submission/list`, {
-                params: {
-                    form_id,
-                    page,
-                    page_size,
-                    sort_field,
-                    sort_order,
-                    search,
-                }
+            const { data: { code, msg, data } } = await axiosInstance.get(
+                `/formhelper/submission/list`, {
+                params
             });
-            const { code, msg, data } = response.data;
-            if (code == 0) {
-                return {
-                    code: 200,
-                    msg: msg,
-                    data: data
-                }
-            }
             return {
-                code: 500,
-                msg: msg
+                code: code === 0 ? 200 : 500,
+                msg: msg,
+                data: code === 0 && data
             }
         } catch(e) {
             return {
@@ -83,20 +82,19 @@ class SubmissionService {
         }
     }
 
-    async removeSubmissionSelected(ids: number[]) {
+    /**
+     * 接口服务：删除提交数据详情
+     * @description 删除指定 id 的提交数据详情
+     * @param {string} id 表单提交数据表的 id
+     */
+    async removeSubmissionSelected(ids: string[]) {
         try {
-            const response = await axiosInstance.post(`/formhelper/submission/deleteSelected`, {
+            const { data: { code, msg } } = await axiosInstance.post(
+                `/formhelper/submission/deleteSelected`, {
                 ids: ids,
             });
-            const { code, msg } = response.data;
-            if (code == 0) {
-                return {
-                    code: 200,
-                    msg: msg
-                }
-            }
             return {
-                code: 500,
+                code: code === 0 ? 200 : 500,
                 msg: msg
             }
         } catch (e) {
@@ -107,25 +105,21 @@ class SubmissionService {
         }   
     }
 
-    // 获取提交数据的详情
-    async getSubmissionView({ id }: getSubmissionViewProps) {
+    /**
+     * 接口服务：获取提交数据详情
+     * @description 获取指定 id 的提交数据详情
+     * @param {string} id 表单提交数据表的 id
+     */
+    async getSubmissionView(id: string) {
         try {
-            const response = await axiosInstance.get(`/formhelper/submission/view`, {
-                params: {
-                    id
-                }
+            const { data: { code, msg, data } } = await axiosInstance.get(
+                `/formhelper/submission/view`, {
+                params: { id }
             });
-            const { code, msg, data } = response.data;
-            if (code == 0) {
-                return {
-                    code: 200,
-                    msg: msg,
-                    data: data
-                }
-            }
             return {
-                code: 500,
-                msg: msg
+                code: code === 0 ? 200 : 500,
+                msg: msg,
+                data: code === 0 && data
             }
         } catch(e) {
             return {
@@ -135,6 +129,25 @@ class SubmissionService {
         }
     }
 
+    async createSubmission({ form_id, fields }: createSubmissionProps) {
+        try {
+            const { data: { code, msg } } = await axiosInstance.post(
+                `/formhelper/submission/create`, {
+                    form_id,
+                    fields
+                }
+            )
+            return {
+                code: code === 0 ? 200 : 500,
+                msg: msg
+            }
+        } catch(e) {
+            return {
+                code: 500,
+                msg: (e as Error).message
+            } 
+        }
+    }
 }
 
 export default new SubmissionService();
