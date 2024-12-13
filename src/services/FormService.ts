@@ -39,7 +39,8 @@ export interface formBaseProps {
     single: boolean,
     logged: boolean,
     disabled: boolean,
-    count?: number
+    count?: number,
+    total_count?: number
 }
 
 export interface formFieldsProps {

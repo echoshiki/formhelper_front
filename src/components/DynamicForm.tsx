@@ -575,7 +575,7 @@ const DynamicForm = ({ id, onActionForm }: DynamicFormProps) => {
 										mode="single"
 										selected={parseDate(formBase.started_at)}
 										onSelect={(date) => handleDateSelect('started_at', date)}
-										defaultMonth={parseDate(formBase.started_at)}
+										defaultMonth={parseDate(formBase.started_at ?? new Date())}
 										initialFocus
 									/>
 								</PopoverContent>
@@ -596,7 +596,7 @@ const DynamicForm = ({ id, onActionForm }: DynamicFormProps) => {
 										mode="single"
 										selected={parseDate(formBase.expired_at)}
 										onSelect={(date) => handleDateSelect('expired_at', date)}
-										defaultMonth={parseDate(formBase.expired_at)}
+										defaultMonth={parseDate(formBase.expired_at ?? new Date())}
 										initialFocus
 									/>
 								</PopoverContent>

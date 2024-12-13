@@ -28,13 +28,16 @@ interface dynamicInputProps {
 }
 
 const DynamicInput = ({ name, type, label, options, required, value, onChange }: dynamicInputProps) => {
+
     // 管理日期弹窗打开和关闭
     const [isPopOpen, setIsPopOpen] = useState<boolean>(false);
+
     // 处理输入框
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
         onChange?.(name, value);
     }
+
     // 处理日期选择框
     const handleDateSelect = (name: string, selectedDate: Date | undefined) => {
 		if (selectedDate) {
@@ -44,6 +47,7 @@ const DynamicInput = ({ name, type, label, options, required, value, onChange }:
 		// 关闭弹窗
 		togglePopOpen(false);
 	};
+
     // 处理多选框
     const handleCheckedChange = (name: string, option: string, checked: boolean | string) => {
         if (checked) {
@@ -56,10 +60,12 @@ const DynamicInput = ({ name, type, label, options, required, value, onChange }:
             onChange?.(name, newOptions);
         }
     }
+
     // 切换弹出框状态
     const togglePopOpen = (status: boolean) => {
 		setIsPopOpen(status);
 	}
+
     // 根据类型渲染 DOM 组件
     const renderInput = () => {
         switch (type) {
@@ -91,7 +97,7 @@ const DynamicInput = ({ name, type, label, options, required, value, onChange }:
                                 mode="single"
                                 selected={parseDate(value)}
                                 onSelect={(date) => handleDateSelect(name, date)}
-                                defaultMonth={parseDate(value)}
+                                defaultMonth={parseDate(value ?? new Date())}
                                 initialFocus
                             />
                         </PopoverContent>

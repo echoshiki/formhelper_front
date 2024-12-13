@@ -14,6 +14,7 @@ import Submission from '@/pages/Submission';
 import SubmissionView from '@/pages/SubmissionView';
 import View from '@/pages/View';
 import NotFound from '@/pages/404';
+import Error from '@/pages/Error';
 
 interface privateRouteProps {
 	element: React.ReactNode,
@@ -36,6 +37,7 @@ function App() {
 		<RootLayout>
 			<MessageHandler />
 			<Routes>
+				{/* 登录页面 */}
 				<Route path="/login" element={currentUser ? <Navigate to="/" /> : <Login />} />
 				{/* 登录检测 */}
 				<Route path="/" element={<PrivateRoute element={<Home />} currentUser={currentUser} />} />
@@ -48,7 +50,10 @@ function App() {
 				{/* 直接访问 */}
 				<Route path="/v/:id" element={<View />} />
 				<Route path="/404" element={<NotFound />} />
+				<Route path="/error" element={<Error />} />
 				<Route path="/test" element={<Test />} />
+				{/* 捕获所有未定义的路有 */}
+				<Route path="*" element={<NotFound />} />
 			</Routes>
 		</RootLayout>
 	)

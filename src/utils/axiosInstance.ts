@@ -17,6 +17,9 @@ axiosInstance.interceptors.response.use(
             authStore.clearCurrentUser();
             localStorage.clear(); // 清除 localStorage 中的用户信息
             authStore.setMessage(response.data.message);
+
+            // 跳转到登录页
+            window.location.href = '/login';
         }
         // 返回数据
         return response;

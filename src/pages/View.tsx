@@ -15,7 +15,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { showToast } from "@/utils/common";
 import { Spinner } from "@/components/package/Spinner";
 import SubmissionService, { createSubmissionFieldsProps } from "@/services/SubmissionService";
-import travel from "@/assets/travel.svg";
+import LandingPage from "@/components/LandingPage";
 
 const View = () => {
 
@@ -66,6 +66,15 @@ const View = () => {
         try {
             const { data: responseData } = await FormService.getFormView(id);
 
+            // 检测是否被禁止
+            responseData.base.disabled && navigate('/error');
+
+            // 检测是否到期
+            responseData.base.expired_at && new Date(responseData.base.expired_at) < new Date() && navigate('/error');
+
+            // 检测是否超过最大填写次数
+            responseData.base.limited && responseData.base.total_count >= responseData.base.limited && navigate('/error');
+
             // 检测是否限填一次
             if (responseData.base.count > 0 && responseData.base.single) {
                 setSubmitted(true);
@@ -106,7 +115,7 @@ const View = () => {
         // 为传递数据新构造一个对应结构的数组
         const fieldsComplete: createSubmissionFieldsProps[] = [];
 
-        // 检测验证
+        // 检测验证各个字段
         for (const item of formFields.current) {
             if (item.required && !formFieldValues[item.id]) {
                 showToast(`${item.label} 是必填项！`);
@@ -120,40 +129,34 @@ const View = () => {
             });
         }
 
+        // 如果字段数组为空，则返回 false
         if (fieldsComplete.length  == 0) 
             return false;
 
-        // 提交数据
+        // 通过验证，则继续提交数据
         const response = await SubmissionService.createSubmission({ 
-            form_id: id, 
+            form_id: id,
             fields: fieldsComplete 
         });
+
         showToast(`${response.msg}`, response.code === 200 ? 1 : 2);
+
         // 跳转页面
         response.code == 200 && setSubmitted(true);
     };
-
-    const SuccessMessage = () => {
-        return (
-            <Card className="w-72 md:w-auto mx-auto px-10 py-20 h-full flex items-center">
-                <div className="text-center w-full">
-                    <div className="flex justify-center mb-10">
-                        <img src={travel} className="w-72" />
-                    </div>
-                    <h1 className="text-3xl font-bold mt-2">提交成功</h1>
-                    <p className="text-sm font-light mt-3 text-slate-500">太好了，我们很快就会收到您的提交</p>
-                    <Button className="mt-10" onClick={() => navigate('/')}>返回首页</Button>
-                </div>
-            </Card>
-        );
-    }
 
     return (
         <>
         {/* 载入数据 */}
         {loading && <Spinner />}
         {/* 提交后页面 */}
-        {!loading && submitted && <SuccessMessage />}
+        {!loading && submitted && (
+            <LandingPage
+                coverPhoto="confirmed"
+                title="提交成功"
+                description="太好了，我们很快就会收到您的提交"
+            />
+        )}
         {/* 表单页面 */}
         {!loading && !submitted && (
             <Card className="w-72 md:w-auto mx-auto pt-2 pb-4">

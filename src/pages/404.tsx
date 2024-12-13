@@ -1,21 +1,11 @@
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { FileX2 } from "lucide-react";
 
 const NotFound = () => {
     return (
-        <Card className="w-72 md:w-auto mx-auto px-10 py-20 h-full flex items-center">
-            <div className="text-left">
-                <p className="text-lg flex items-center space-x-2">
-                    <FileX2 size="20" />
-                    <p>404 Page</p>
-                </p>
-                <h1 className="text-5xl font-extrabold mt-2">Page Not Found</h1>
-                <p className="text-lg font-light mt-5">对不起，你所访问的页面似乎没有找到。</p>
-                <div className="flex space-x-2 mt-10">
-                    <Button>返回首页</Button>
-                    <Button variant={`outline`}>个人中心</Button>
-                </div>
+        <Card className="w-72 md:w-full mx-auto px-10 py-20 h-full flex items-center justify-center ">
+            <div className="h-full flex items-center space-x-2">
+                <span className="text-2xl font-semibold border-r border-gray-400 pr-6 leading-10">404</span>
+                <span className="text-sm font-light px-3 text-gray-500">当前访问的页面无法找到</span>
             </div>
         </Card>
     )
