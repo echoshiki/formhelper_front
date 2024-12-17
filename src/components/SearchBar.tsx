@@ -16,7 +16,7 @@ export const SearchBar = ({ onSearchButton }: SearchBar) => {
                     placeholder="搜索标题或者描述..."
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)} />
-                <Button className="h-8 rounded-l-none" onClick={() => onSearchButton(searchInput)}>搜索</Button>
+                <Button className="h-8 rounded-l-none text-xs" onClick={() => onSearchButton(searchInput)}>搜索</Button>
             </div>
         </div>
     );

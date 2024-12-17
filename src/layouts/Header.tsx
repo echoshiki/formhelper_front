@@ -12,7 +12,7 @@ export default function Header({ title }: { title: string }) {
     return (
         <Card className="w-full px-5 py-6">
             <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3">
                     <Link to="/">
                         <House />
                     </Link>
@@ -26,12 +26,9 @@ export default function Header({ title }: { title: string }) {
                     )} 
                 </div>
                 <div>
-                    <div className="flex items-center space-x-1">
-                        <Link to="/test">
-                            <Button className="w-20 h-8 mr-2 text-xs"> 测试 </Button>
-                        </Link>
+                    <div className="flex items-center space-x-2">
                         <Link to="/create">
-                            <Button variant="secondary" className="w-20 h-8 mr-2 text-xs"> 创建表单 </Button>
+                            <Button color="black" className="w-20 h-8 mr-2 text-xs"> 创建表单 </Button>
                         </Link>
 
                         <DropdownMenu>
@@ -43,20 +40,26 @@ export default function Header({ title }: { title: string }) {
                                 )}
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
-                                <DropdownMenuLabel className="py-2">
+                                <DropdownMenuLabel className="py-3">
                                     <p>{currentUser ? currentUser.username : ""}</p>
                                     <p className="text-slate-600 text-xs font-light">{currentUser ? currentUser.email : ""}</p>
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
-                                    <Link to="/profile">修改资料</Link>
+                                    <Link to="/profile">
+                                        <p>个人资料</p>
+                                    </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
-                                    <Link to="/forms">我的表单</Link>
+                                    <Link to="/forms">
+                                        <p>我的表单</p>
+                                    </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>升级额度</DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <p>升级额度</p>
+                                </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="flex items-center space-x-1">
+                                <DropdownMenuItem className="py-3 flex items-center space-x-1">
                                     <LogOut size="16" />
                                     <a href="#" onClick={logout}>注销登录</a>
                                 </DropdownMenuItem>

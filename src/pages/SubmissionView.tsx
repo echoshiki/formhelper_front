@@ -10,9 +10,6 @@ import { Clock, Trash2, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-
-
-
 const SubmissionView = () => {
     const { id } = useParams();
     if (!id) return;
@@ -48,7 +45,7 @@ const SubmissionView = () => {
             case "checkbox":
                 return JSON.parse(value).join(',');
             default:
-                return JSON.parse(value);
+                return value;
         }
     }
 

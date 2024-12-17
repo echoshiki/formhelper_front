@@ -35,7 +35,7 @@ interface getSubmissionListProps {
     page_size: number,
     sort_field: string,
     sort_order: string,
-    search: string,
+    search?: string,
 }
 
 // 提交数据的字段属性
@@ -140,6 +140,23 @@ class SubmissionService {
             return {
                 code: code === 0 ? 200 : 500,
                 msg: msg
+            }
+        } catch(e) {
+            return {
+                code: 500,
+                msg: (e as Error).message
+            } 
+        }
+    }
+
+    async getSimpleList() {
+        try {
+            const { data: { code, msg, data } } = await axiosInstance.get(
+                `/formhelper/submission/simple_list`);
+            return {
+                code: code === 0 ? 200 : 500,
+                msg: msg,
+                data: code === 0 && data
             }
         } catch(e) {
             return {

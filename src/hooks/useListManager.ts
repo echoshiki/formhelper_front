@@ -17,8 +17,14 @@ interface sortProps {
 export default function useListManager<T> (
     fetchService: (param: any) => Promise<any>,
     initialParams: any = {},
-    initialPagination: paginationProps = { page: 1, page_size: 10 },
-    initialSort: sortProps = { field: "id", order: "desc" }
+    initialPagination: paginationProps = { 
+        page: 1, 
+        page_size: 5 
+    },
+    initialSort: sortProps = { 
+        field: "id", 
+        order: "desc" 
+    }
 ) {
     // 列表数据
     const [items, setItems] = useState<T[]>([]); // 泛型 T 表示不同数据的类型
@@ -39,8 +45,9 @@ export default function useListManager<T> (
             page_size: pagination.page_size,
             sort_field: sort.field,
             sort_order: sort.order,
-            search: searchKeyword
+            search: searchKeyword,
         };
+        
         const response = await fetchService(params);
         setItems(response.data?.items || []);
         setPagination(response.data?.pagination);

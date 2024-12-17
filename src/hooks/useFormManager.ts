@@ -7,7 +7,7 @@ import FormService, { formBaseProps, formFieldsProps } from "@/services/FormServ
  * @param id 表单的 id
  * @description 通过是否传递 id 参数来判断创建或者修改
  */
-export default function useFormManager (id: number | null) {
+export default function useFormManager (id: string | null) {
     // 表单的基础数据
     const [formBase, setFormBase] = useState<formBaseProps>({
 		title: '',

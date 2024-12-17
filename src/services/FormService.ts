@@ -21,7 +21,8 @@ interface getFormListProps {
     page_size: number,
     sort_field: string,
     sort_order: string,
-    search: string,
+    fields: string,
+    search?: string
 }
 
 export interface formActionProps {
@@ -30,7 +31,7 @@ export interface formActionProps {
 }
 
 export interface formBaseProps {
-    id: string,
+    id?: string,
     title: string,
     description: string,
     started_at: string,
@@ -64,13 +65,14 @@ class FormService {
      * @param {string} sort_field 排序字段
      * @param {string} sort_order 排序规则
      * @param {string} search 搜索关键词
+     * @param {string} fields 指定查询的字段，逗号分隔开
      */
     async getFormList(params: getFormListProps) {
         try {
             // 直接解构出 response.data 重命名成 responseData
             const { data: responseData } = await axiosInstance.get(
                 `/formhelper/form/list`, { 
-                params 
+                params
             });
             const { code, msg, data } = responseData;
             return code === 0
@@ -188,6 +190,28 @@ class FormService {
             }
         }
     }
+
+    /**
+     * 接口服务：获取统计数据
+     * @description 为后台首页获取展现数据
+     */
+    async getDataCount() {
+        try {
+            const { data: { code, msg, data } } = await axiosInstance.get(
+                `/formhelper/form/getDataCount`
+            );
+            return {
+                code: code === 0 ? 200 : 500,
+                msg: msg,
+                data: code === 0 && data
+            }
+        } catch (e) {
+            return {
+                code: 500,
+                msg: (e as Error).message
+            }
+        }
+    } 
 }
 
 export default new FormService();
