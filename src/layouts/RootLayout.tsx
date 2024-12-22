@@ -1,15 +1,15 @@
 import React from 'react';
 import { Toaster } from '@/components/ui/toaster';
-import Footer from './Footer';
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {  
     return (
-        <div className="w-full min-h-screen py-10 flex bg-gradient-to-tr from-slate-50 to-slate-300">
-            <main className="w-4/5 lg:w-3/4 xl:w-2/3 mx-auto">      
-                {children}                
-                <Footer />
-            </main>
-            <Toaster />
+        <div className="w-full min-h-screen py-2 lg:px-0 lg:py-10 flex bg-gradient-to-tr from-gray-50 to-gray-300">
+            <div className="w-full">
+                <main className="w-11/12 lg:w-3/4 xl:w-2/3 mx-auto">      
+                    {children}                
+                </main>
+                <Toaster /> 
+            </div>
         </div>
     );
 };

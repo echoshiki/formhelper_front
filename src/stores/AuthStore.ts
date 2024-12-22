@@ -13,6 +13,8 @@ interface authStateProps {
     syncUser: () => Promise<void>,
     fetchCaptcha: (type: "login" | "register") => Promise<void>,
     initialize: () => void,
+    isLogin: boolean,
+    setIsLogin: (bool: boolean) => void,
 }
 
 const getUserFromLocalStorage = (): { username: string } | null => {
@@ -24,6 +26,12 @@ const useAuthStore = create<authStateProps>((set) => ({
     currentUser: getUserFromLocalStorage(),
     message: null,
     captchaLabel: '',
+    isLogin: true,
+
+    // 设置登录/注册页面的类型
+    setIsLogin: (bool) => {
+        set({ isLogin: bool });
+    },
 
     clearCurrentUser: () => {
         set({ currentUser: null });
@@ -84,6 +92,8 @@ const useAuthStore = create<authStateProps>((set) => ({
             const response = await AuthService.register(registerInfo);
             if (response.code == 200) {
                 set({
+                    // 注册成功跳回到登录页面
+                    isLogin: true,
                     message: response.msg,
                 });
             } else {

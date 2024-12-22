@@ -204,8 +204,8 @@ const Profile = () => {
 			</Card>
 
 			<Card className="py-5 mt-2">
-                <CardContent className="p-0 pl-5">
-					<Button onClick={updateProfile}>更新信息</Button>
+                <CardContent className="p-0 px-5">
+					<Button className="w-full lg:w-auto" onClick={updateProfile}>更新信息</Button>
                 </CardContent>
             </Card>
 		</>

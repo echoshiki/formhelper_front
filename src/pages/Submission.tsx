@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import Header from "@/layouts/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,7 +26,7 @@ interface submissionListProps {
 }
 
 const SubmissionList = ({
-    items,
+    items: submissions,
     pagination,
     onRemoveSelected,
     onSetPage,
@@ -45,15 +44,45 @@ const SubmissionList = ({
     const handleCheckedAll = () => {
         // 返回包含所有页面数据 id 的数组
         setCheckedList(prev => (
-            prev.length != items.length
-                ? items.map(item => item.id)
+            prev.length != submissions.length
+                ? submissions.map(item => item.id)
                 : []
         ));
     }
 
     return (
         <>
-            <Table className="border">
+            <div className="lg:hidden">
+                <Table className="mb-2">
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>日期</TableHead>
+                            <TableHead>数据</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {submissions.map(item => (
+                            <TableRow key={item.id}>
+                                <TableCell className="pl-0">
+                                    <Badge variant={`outline`} className="px-2 rounded-md font-mono">{dateFormatter(new Date(item.submitted_at), 'm-d')}</Badge>
+                                </TableCell>
+                                <TableCell className="px-0 text-sm lg:text-sm">
+                                    <Link to={`/submissions/form_id/${item.id}`} >
+                                    用户 {item.user.username} 提交了表单
+                                    </Link>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                <PaginationSimple
+                    page={pagination.page}
+                    total_pages={pagination.total_pages || 0}
+                    onSetPage={onSetPage} 
+                />
+            </div>
+
+            <Table className="border hidden lg:table">
                 <TableHeader>
                     <TableRow>
                         <TableHead></TableHead>
@@ -67,7 +96,7 @@ const SubmissionList = ({
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {items.length ? items.map((item) => (
+                    {submissions.length ? submissions.map(item => (
                         <TableRow key={item.id}>
                             <TableCell>
                                 <Checkbox className="flex items-center"
@@ -110,7 +139,7 @@ const SubmissionList = ({
                     <TableRow>
                         <TableCell>
                             <Checkbox className="flex items-center"
-                                checked={items.length != 0 && checkedList.length == items.length}
+                                checked={submissions.length != 0 && checkedList.length == submissions.length}
                                 onCheckedChange={handleCheckedAll} />
                         </TableCell>
                         <TableCell colSpan={5}>
@@ -184,7 +213,7 @@ const Submission = () => {
             {!loading ? (
                 <>
                 <Header title="数据" />
-                <Card className="py-5 mt-2">
+                <Card className="w-full py-5 mt-2">
                     <CardContent>
                         <SubmissionList
                             items={items}

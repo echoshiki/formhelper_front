@@ -27,6 +27,7 @@ import config from '@/config';
 import ShareLinkButton from "@/components/ShareLinkButton";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import SimpleList from "@/components/SimpleLIst";
 
 /**
  * 操作按钮组件
@@ -118,7 +119,7 @@ const FormItem = ({ formItem, checkedList, onCheckedItem, onRemoveButton }: {
                 <Badge variant="secondary">{dateFormatter(new Date(formItem.started_at))}</Badge>
             </TableCell>
             <TableCell>
-                <Badge variant="secondary">{dateFormatter(new Date(formItem.expired_at))}</Badge>
+                <Badge variant="secondary">{formItem.expired_at ? dateFormatter(new Date(formItem.expired_at)) : "无限期"}</Badge>
             </TableCell>
             <TableCell>
                 <Link to={`/submissions/form_id/${formItem.id}`} className="cursor-pointer flex items-center">
@@ -188,20 +189,41 @@ export const FormList = ({
         ));
     }
 
+    // 移动端表格列表构建
+    const SimpleListFields = [
+        { label: '日期', name: 'created_at', type: 'date' },
+        { label: '数据', name: 'title', type: 'text', linkPattern: 'submissions/form_id/{id}' },
+    ];
+
     return (
         <>
-            <Table className="border">
+            {/* 移动端列表 */}
+            <div className="lg:hidden">
+                {/* 移动端简洁列表 */}
+                <SimpleList<formItemProps> 
+                    list={forms} 
+                    fields={SimpleListFields} 
+                />
+                <PaginationSimple
+                    page={pagination.page}
+                    total_pages={pagination.total_pages || 0}
+                    onSetPage={onSetPage} 
+                />
+            </div>
+            
+            <Table className="border hidden lg:table">
                 <TableHeader>
                     <TableRow>
                         <TableHead></TableHead>
                         {/* 只遍历字段的渲染，并不关联列表值 */}
-                        {displayFields.filter(item => item.display).map(item => item.sort ? (
+                        {displayFields.filter(item => item.display).map((item, key) => item.sort ? (
                             <SortableTableHead 
+                                key={key}
                                 title={item.label}
                                 field={item.field}
                                 onSetSort={onSetSort} />
                         ) : (
-                            <TableHead className={`w-${item.width}`}>{item.label}</TableHead>
+                            <TableHead key={key} className={`w-${item.width}`}>{item.label}</TableHead>
                         ))}
                         <TableHead>操作</TableHead>
                     </TableRow>
@@ -279,7 +301,11 @@ const TableButtonGroup = ({ displayFields, onSetSort }: {
     return (
         <div className="flex items-center justify-end space-x-2">
             <Link to="/create">
-                <Button variant="outline" size="sm" className="flex items-center space-x-1 h-8 text-xs">
+                <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center space-x-1 h-8 text-xs"
+                >
                     <CirclePlus size="12" />
                     <span>新增</span>
                 </Button>
@@ -293,8 +319,8 @@ const TableButtonGroup = ({ displayFields, onSetSort }: {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="py-2">
-                    {displayFields.filter(item => item.sort).map(item => (
-                        <DropdownMenuItem>
+                    {displayFields.filter(item => item.sort).map((item, key) => (
+                        <DropdownMenuItem key={key}>
                             <a href="#" onClick={() => onSetSort(item.field)}>{item.label}</a>
                         </DropdownMenuItem>
                     ))}
@@ -369,9 +395,9 @@ const Form = () => {
             {!loading ? (
                 <>
                 <Header title="表单" />
-                <Card className="py-5 mt-2">
+                <Card className="w-full py-5 mt-2">
                     <CardHeader className="py-2">
-                        <div className="flex justify-between">
+                        <div className="flex flex-wrap direction-reverse lg:direction-normal space-y-2 lg:space-y-0 lg:justify-between lg:pb-0">
                             <SearchBar onSearchButton={handleSearchButton} />
                             <TableButtonGroup 
                                 displayFields={displayFields} 

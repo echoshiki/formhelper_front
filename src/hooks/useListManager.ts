@@ -19,7 +19,7 @@ export default function useListManager<T> (
     initialParams: any = {},
     initialPagination: paginationProps = { 
         page: 1, 
-        page_size: 5 
+        page_size: 10 
     },
     initialSort: sortProps = { 
         field: "id", 
