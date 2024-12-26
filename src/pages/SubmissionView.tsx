@@ -74,14 +74,16 @@ const SubmissionView = () => {
                             <TableFooter>
                                 <TableRow>
                                     <TableCell colSpan={3} >
-                                        <div className="w-full flex justify-between">
-                                            <p className="font-normal flex items-center">
-                                                <UserRound size="15"/>&nbsp;&nbsp;{submissionData?.username}
-                                                &nbsp;&nbsp; <Clock size="15" />&nbsp;&nbsp;{submissionData?.submitted_at}</p>
+                                        <div className="w-full flex justify-between flex-col lg:flex-row space-y-3 lg:space-y-0">
+                                            <div className="font-light text-gray-500 flex items-center flex-col lg:flex-row space-y-1 lg:space-y-0 lg:space-x-5">
+                                                <p className="w-full lg:w-auto flex items-center"><UserRound size="15"/>&nbsp;&nbsp;{submissionData?.username}</p>
+                                                <p className="w-full flex items-center"><Clock size="15" />&nbsp;&nbsp;{submissionData?.submitted_at}</p>                                                
+                                            </div>
                                             <IsSure
                                                 title="确认删除么？"
                                                 description="数据删除之后无法恢复，再次确认，是否需要删除？"
-                                                onConfirm={handleRemoveSelected} >
+                                                onConfirm={handleRemoveSelected}
+                                            >
                                                 <Button
                                                     variant="destructive"
                                                     size="sm"

@@ -4,21 +4,13 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableRow,
-} from "@/components/ui/table"
 import { Progress } from "@/components/ui/progress";
 import Header from "@/layouts/Header";
 import React, { useEffect, useState } from "react";
 import FormService from "@/services/FormService";
 import { Database, Flower, Notebook, Table2 } from "lucide-react";
-import { dateFormatter } from "@/utils/dateFormatter";
 import SubmissionService from "@/services/SubmissionService";
-import { Link } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
+import SimpleList from "@/components/SimpleLIst";
 
 // 数据统计卡片
 const CountCard = ({ title, count, Icon }: {
@@ -35,7 +27,7 @@ const CountCard = ({ title, count, Icon }: {
                 <Icon size="24" className="hidden lg:block" />
             </CardHeader>
             <CardContent className="pb-5">
-                <div className="text-3xl font-bold">{count}</div>
+                <div className="text-2xl font-bold">{count}</div>
             </CardContent>
         </Card>
     )
@@ -60,12 +52,22 @@ const Home = () => {
         created_at: string,
     }[]>([]);
 
+    const recentFormFields = [
+        { label: '日期', name: 'created_at', type: 'date' },
+        { label: '数据', name: 'title', type: 'text', linkPattern: '/submissions/form_id/{id}'},
+    ];
+
     // 最新数据
     const [recentSubmissions, setRecentSubmissions] = useState<{
         id: string,
         username: string,
         submitted_at: string,
     }[]>([]);
+
+    const recentSubmissionFields = [
+        { label: '日期', name: 'submitted_at', type: 'date' },
+        { label: '数据', name: 'username', type: 'text', linkPattern: '/submissions/{id}', valuePattern: '用户 [{value}] 提交了表单'},
+    ];
 
     // 获取统计数据
     const fetchCountData = async () => {
@@ -129,19 +131,10 @@ const Home = () => {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <Table>
-                            <TableBody>
-                                {recentSubmissions.map((item, key) => (
-                                    <TableRow key={key}>
-                                        <TableCell className="px-0 text-sm lg:text-sm">
-                                            <Link to={`/submissions/${item.id}`} >
-                                                <Badge variant={`outline`} className="rounded-sm">{dateFormatter(new Date(item.submitted_at), 'm-d')}</Badge>&nbsp;&nbsp;用户 {item.username} 提交了表单
-                                            </Link>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                        <SimpleList 
+                            list={recentSubmissions}
+                            fields={recentSubmissionFields}
+                        />
                     </CardContent>
                 </Card>
                 <Card className="w-full lg:w-1/2 mt-2">
@@ -151,19 +144,10 @@ const Home = () => {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <Table>
-                            <TableBody>
-                                {recentForms.map((item, key) => (
-                                    <TableRow key={key}>
-                                        <TableCell className="px-0 text-sm lg:text-sm">
-                                            <Link to={`/submissions/form_id/${item.id}`} >
-                                            <Badge variant={`outline`} className="rounded-sm">{dateFormatter(new Date(item.created_at), 'm-d')}</Badge>&nbsp;&nbsp;{item.title}
-                                            </Link>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                        <SimpleList 
+                            list={recentForms}
+                            fields={recentFormFields}
+                        />
                     </CardContent>
                 </Card>
             </div>

@@ -1,17 +1,23 @@
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { 
+    DropdownMenu, 
+    DropdownMenuContent, 
+    DropdownMenuItem, 
+    DropdownMenuLabel, 
+    DropdownMenuSeparator, 
+    DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 import useAuthStore from "@/stores/AuthStore";
 import { ArrowLeft, CircleUserRound, House, LogOut, LucideMenu } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
 import {
     Drawer,
     DrawerContent,
     DrawerFooter,
     DrawerHeader,
     DrawerTrigger,
-  } from "@/components/ui/drawer"
+  } from "@/components/ui/drawer";
 
 export default function Header({ title }: { title: string }) {
     const { currentUser, logout } = useAuthStore();
@@ -52,8 +58,8 @@ export default function Header({ title }: { title: string }) {
                                 </div>
                             </DrawerHeader>
                             <DrawerFooter>
-                                <Button onClick={() => navigate('/create')}>创建</Button>
-                                <Button variant={`outline`} onClick={() => navigate('/forms')}>表单</Button>
+                                <Button onClick={() => navigate('/create')}>创建表单</Button>
+                                <Button variant={`outline`} onClick={() => navigate('/forms')}>我的表单</Button>
                                 <div className="flex justify-between mt-2">
                                     <Button onClick={() => navigate('/profile')} className="underline" variant={`link`}>个人资料</Button>
                                     <Button variant={`link`} onClick={logout}>

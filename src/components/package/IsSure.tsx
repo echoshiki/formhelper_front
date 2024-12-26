@@ -24,7 +24,7 @@ export const IsSure = ({children, title, description, onConfirm}: IsSureProps) =
             <AlertDialogTrigger asChild>
                 {children}
             </AlertDialogTrigger>
-            <AlertDialogContent>
+            <AlertDialogContent className="max-w-xs lg:max-w-lg">
                 <AlertDialogHeader>
                     <AlertDialogTitle>{title}</AlertDialogTitle>
                     <AlertDialogDescription>

@@ -25,9 +25,12 @@ import { SortableTableHead } from "@/components/SortableTableHead";
 import config from '@/config';
 // 分享链接二维码的按钮组件
 import ShareLinkButton from "@/components/ShareLinkButton";
-
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import SimpleList from "@/components/SimpleLIst";
+import ShareLinkContent from "@/components/ShareLinkContent";
+import DialogButton, { dialogStateProps } from "@/components/DialogButton";
+import { useNavigate } from 'react-router-dom';
+
 
 /**
  * 操作按钮组件
@@ -116,13 +119,13 @@ const FormItem = ({ formItem, checkedList, onCheckedItem, onRemoveButton }: {
                 </Link>
             </TableCell>
             <TableCell>
-                <Badge variant="secondary">{dateFormatter(new Date(formItem.started_at))}</Badge>
+                <Badge variant="secondary" className="font-mono">{dateFormatter(new Date(formItem.started_at))}</Badge>
             </TableCell>
             <TableCell>
-                <Badge variant="secondary">{formItem.expired_at ? dateFormatter(new Date(formItem.expired_at)) : "无限期"}</Badge>
+                <Badge variant="secondary" className="font-mono">{formItem.expired_at ? dateFormatter(new Date(formItem.expired_at)) : "无限期"}</Badge>
             </TableCell>
             <TableCell>
-                <Link to={`/submissions/form_id/${formItem.id}`} className="cursor-pointer flex items-center">
+                <Link to={`/submissions/form_id/${formItem.id}`} className="cursor-pointer flex items-center font-mono">
                     <Search className="w-3.5 h-3.5 mr-1" />
                     {formItem.submissions_count}
                 </Link>
@@ -189,28 +192,63 @@ export const FormList = ({
         ));
     }
 
-    // 移动端表格列表构建
-    const SimpleListFields = [
+    const navigate = useNavigate();
+    
+    // 移动端表格列表渲染结构
+    const simpleFormFields = [
         { label: '日期', name: 'created_at', type: 'date' },
-        { label: '数据', name: 'title', type: 'text', linkPattern: 'submissions/form_id/{id}' },
+        { label: '数据', name: 'title', type: 'text', linkPattern: 'submissions/form_id/{id}'},
     ];
+
+    // 移动端操作组
+    const simpleFormActions = [
+        { label: '编辑', paramName: 'id', onAction: (id: string) => navigate(`/edit/form_id/${id}`) },
+        { label: '删除', paramName: 'id', onAction: (id: string) => confirm('确认删除么？') && onRemoveSelected([Number(id)])},
+        { label: '分享', paramName: 'id', onAction: (id: string) => handleShareLink(id) }
+    ];
+
+    // 弹窗信息状态管理
+    const [shareDialogState, setShareDialogState] = useState<dialogStateProps>({
+        label: '分享表单',
+        title: '分享表单',
+        description: '将表单链接分享到社区、聊天群或者你想的任何人！',
+        content: null,
+        isOpen: false
+    });
+
+    const handleShareLink = (id: string) => {
+        setShareDialogState({
+            ...shareDialogState,
+            isOpen: true,
+            content: (<ShareLinkContent url={`${config.APP_BASE_URL}/v/${id}`} />)
+        });
+        // 清楚遮罩
+        document.body.style.pointerEvents = "";
+    }
 
     return (
         <>
-            {/* 移动端列表 */}
+            {/* 移动端渲染列表 */}
             <div className="lg:hidden">
                 {/* 移动端简洁列表 */}
                 <SimpleList<formItemProps> 
                     list={forms} 
-                    fields={SimpleListFields} 
+                    fields={simpleFormFields} 
+                    actions={simpleFormActions}
                 />
+                {/* 移动端简洁分页 */}
                 <PaginationSimple
                     page={pagination.page}
                     total_pages={pagination.total_pages || 0}
                     onSetPage={onSetPage} 
                 />
+                {/* 分享二维码 */}
+                <DialogButton 
+                    dialogState={shareDialogState} 
+                    setDialogState={setShareDialogState} 
+                />
             </div>
-            
+
             <Table className="border hidden lg:table">
                 <TableHeader>
                     <TableRow>
@@ -299,7 +337,7 @@ const TableButtonGroup = ({ displayFields, onSetSort }: {
     onSetSort: (field: string) => void,
 }) => {
     return (
-        <div className="flex items-center justify-end space-x-2">
+        <div className="hidden lg:flex items-center justify-end space-x-2">
             <Link to="/create">
                 <Button 
                     variant="outline" 
@@ -409,10 +447,15 @@ const Form = () => {
                         <FormList
                             displayFields={displayFields}
                             forms={forms}
+                            // 分页 UI
                             pagination={pagination}
+                            // 删除选择项
                             onRemoveSelected={handleRemoveSelected} 
+                            // 跳转页码
                             onSetPage={handleSetPage}
+                            // 设置显示条数
                             onSetPageSize={handleSetPageSize}
+                            // 处理排序
                             onSetSort={handleSetSort} 
                         />
                     </CardContent>

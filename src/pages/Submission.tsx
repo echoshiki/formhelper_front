@@ -13,8 +13,9 @@ import { IsSure } from "@/components/package/IsSure";
 import { Trash2, Eye } from "lucide-react";
 import { PaginationInfo, PaginationSimple } from "@/components/Pagination";
 import { showToast } from "@/utils/common";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Spinner } from "@/components/package/Spinner";
+import SimpleList from "@/components/SimpleLIst";
 
 interface submissionListProps {
     items: submissionItemProps[],
@@ -50,31 +51,27 @@ const SubmissionList = ({
         ));
     }
 
+    const navigate = useNavigate();
+
+    const simpleSubmissionFields = [
+        { label: '日期', name: 'submitted_at', type: 'date' },
+        { label: '数据', name: 'username', type: 'text', linkPattern: '/submissions/{id}', valuePattern: '用户 [{value}] 提交了表单'},
+    ];
+
+    const simpleSubmissionActions = [
+        { label: '查看', paramName: 'id', onAction: (id: string) => navigate(`/submissions/${id}`)},
+        { label: '删除', paramName: 'id', onAction: (id: string) => confirm('确认要删除么？') && onRemoveSelected([id]) }
+    ];
+
     return (
         <>
+            {/* 移动端渲染 */}
             <div className="lg:hidden">
-                <Table className="mb-2">
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>日期</TableHead>
-                            <TableHead>数据</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {submissions.map(item => (
-                            <TableRow key={item.id}>
-                                <TableCell className="pl-0">
-                                    <Badge variant={`outline`} className="px-2 rounded-md font-mono">{dateFormatter(new Date(item.submitted_at), 'm-d')}</Badge>
-                                </TableCell>
-                                <TableCell className="px-0 text-sm lg:text-sm">
-                                    <Link to={`/submissions/form_id/${item.id}`} >
-                                    用户 {item.user.username} 提交了表单
-                                    </Link>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                <SimpleList
+                    list={submissions}
+                    fields={simpleSubmissionFields}
+                    actions={simpleSubmissionActions}
+                />
                 <PaginationSimple
                     page={pagination.page}
                     total_pages={pagination.total_pages || 0}
