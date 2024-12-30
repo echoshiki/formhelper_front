@@ -1,8 +1,7 @@
 import axios from "axios"
 import useAuthStore from "@/stores/AuthStore";
-import config from "@/config"
 
-const baseUrl = config.API_BASE_URL;
+const baseUrl = import.meta.env.VITE_API_URL;
 const axiosInstance = axios.create({
     baseURL: baseUrl,
     timeout: 10000,

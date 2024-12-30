@@ -9,5 +9,8 @@
     "paths": {
       "@/*": ["./src/*"]
     }
-  }
+  },
+  // "exclude": [
+  //   "/src/components/package/DateTimePicker.tsx"
+  // ]
 }

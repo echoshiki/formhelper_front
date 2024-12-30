@@ -22,7 +22,6 @@ import { Link } from "react-router-dom";
 import useListManager, { paginationProps } from "@/hooks/useListManager";
 import { showToast } from "@/utils/common";
 import { SortableTableHead } from "@/components/SortableTableHead";
-import config from '@/config';
 // 分享链接二维码的按钮组件
 import ShareLinkButton from "@/components/ShareLinkButton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -46,7 +45,7 @@ const ActionButtonGroup = ({ formId, onRemoveButton }: {
     return (
         <div className="h-full flex space-x-2">
             {/* 分享二维码的按钮 */}
-            <ShareLinkButton url={`${config.APP_BASE_URL}/v/${formId}`} />
+            <ShareLinkButton url={`${window.location.protocol}//${window.location.hostname}${window.location.port && `:${window.location.port}`}/v/${formId}`} />
             {/* 编辑表单的按钮 */}
             <Link to={`/edit/form_id/${formId}`} className="cursor-pointer flex items-center">
                 <PencilRuler className="w-3.5 h-3.5 cursor-pointer" />
@@ -220,9 +219,9 @@ export const FormList = ({
         setShareDialogState({
             ...shareDialogState,
             isOpen: true,
-            content: (<ShareLinkContent url={`${config.APP_BASE_URL}/v/${id}`} />)
+            content: (<ShareLinkContent url={`${window.location.protocol}//${window.location.hostname}${window.location.port && `:${window.location.port}`}/v/${id}`} />)
         });
-        // 清楚遮罩
+        // 清除遮罩
         document.body.style.pointerEvents = "";
     }
 
