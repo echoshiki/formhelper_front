@@ -14,6 +14,7 @@ import {
 import { dateFormatter } from "@/utils/dateFormatter";
 import { Badge } from "@/components/ui/badge";
 import { EllipsisVertical } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface actionItemProps {
     label: string,
@@ -111,7 +112,7 @@ const SimpleItem = <T extends Record<string, any>> ({ item, fields, actions }: {
             // 根据链接结构，约定以 id 替换
             const url = field.linkPattern.replace('{id}', item.id);
             return (
-                <a href={url} >{fieldValue}</a>
+                <Link to={url} >{fieldValue}</Link>
             )
         }
 

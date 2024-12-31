@@ -6,7 +6,7 @@ import '@/assets/styles/index.css'
 
 createRoot(document.getElementById('root')!).render(
 	<StrictMode>
-		<BrowserRouter>
+		<BrowserRouter basename={import.meta.env.VITE_APP_PREFIX}>
 			<App />
 		</BrowserRouter>
 	</StrictMode>,

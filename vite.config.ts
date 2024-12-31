@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import path from "path"
 
 export default defineConfig({
+  base: '/formhelper',
   plugins: [react()],
   resolve: {
     alias: {

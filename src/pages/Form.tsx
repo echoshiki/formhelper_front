@@ -45,7 +45,7 @@ const ActionButtonGroup = ({ formId, onRemoveButton }: {
     return (
         <div className="h-full flex space-x-2">
             {/* 分享二维码的按钮 */}
-            <ShareLinkButton url={`${window.location.protocol}//${window.location.hostname}${window.location.port && `:${window.location.port}`}/v/${formId}`} />
+            <ShareLinkButton url={`${window.location.protocol}//${window.location.hostname}${window.location.port && `:${window.location.port}`}${import.meta.env.VITE_APP_PREFIX}/v/${formId}`} />
             {/* 编辑表单的按钮 */}
             <Link to={`/edit/form_id/${formId}`} className="cursor-pointer flex items-center">
                 <PencilRuler className="w-3.5 h-3.5 cursor-pointer" />
@@ -219,7 +219,7 @@ export const FormList = ({
         setShareDialogState({
             ...shareDialogState,
             isOpen: true,
-            content: (<ShareLinkContent url={`${window.location.protocol}//${window.location.hostname}${window.location.port && `:${window.location.port}`}/v/${id}`} />)
+            content: (<ShareLinkContent url={`${window.location.protocol}//${window.location.hostname}${window.location.port && `:${window.location.port}`}${import.meta.env.VITE_APP_PREFIX}/v/${id}`} />)
         });
         // 清除遮罩
         document.body.style.pointerEvents = "";
