@@ -159,7 +159,7 @@ const View = () => {
         )}
         {/* 表单页面 */}
         {!loading && !submitted && (
-            <Card className="w-72 md:w-auto mx-auto pt-2 pb-4">
+            <Card className="w-full md:w-auto mx-auto pt-2 pb-4">
                 <CardHeader>
                     <CardTitle className="text-2xl">{formBase.current.title}</CardTitle>
                     <CardDescription className="">

@@ -23,7 +23,7 @@ const LandingPage = ({
         return new URL(`../assets/${filename}.svg`, import.meta.url).href;
     }
     return (
-        <Card className="w-72 md:w-full mx-auto px-10 py-20 h-full flex items-center">
+        <Card className="w-full md:w-full mx-auto px-10 py-20 h-full flex items-center">
             <div className="text-center w-full">
                 <div className="flex justify-center mb-10">
                     <img src={getSvgPath(coverPhoto)} className="w-52" />
