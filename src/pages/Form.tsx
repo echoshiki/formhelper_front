@@ -29,6 +29,7 @@ import SimpleList from "@/components/SimpleLIst";
 import ShareLinkContent from "@/components/ShareLinkContent";
 import DialogButton, { dialogStateProps } from "@/components/DialogButton";
 import { useNavigate } from 'react-router-dom';
+import { getConfig } from "@/config";
 
 
 /**
@@ -38,14 +39,19 @@ import { useNavigate } from 'react-router-dom';
  * @returns 单项数据的操作按钮组
  */
 
-const ActionButtonGroup = ({ formId, onRemoveButton }: { 
-    formId: number,
-    onRemoveButton: (id: number[]) => void,
+const ActionButtonGroup = ({ 
+    formId, 
+    onRemoveButton,
+    getShareLinkUrl
+ }: { 
+    formId: string,
+    onRemoveButton: (id: string[]) => void,
+    getShareLinkUrl: (id: string) => string
 }) => {
     return (
         <div className="h-full flex space-x-2">
             {/* 分享二维码的按钮 */}
-            <ShareLinkButton url={`${window.location.protocol}//${window.location.hostname}${window.location.port && `:${window.location.port}`}${import.meta.env.VITE_APP_PREFIX}/v/${formId}`} />
+            <ShareLinkButton url={getShareLinkUrl(formId)} />
             {/* 编辑表单的按钮 */}
             <Link to={`/edit/form_id/${formId}`} className="cursor-pointer flex items-center">
                 <PencilRuler className="w-3.5 h-3.5 cursor-pointer" />
@@ -61,26 +67,6 @@ const ActionButtonGroup = ({ formId, onRemoveButton }: {
     )
 }
 
-// const FormItemBadge = ({ formItem }: { formItem: formItemProps}) => {
-//     const showBadge = (title: string, type: "default" | "destructive" | "outline" | "secondary" | null | undefined = "default") => (
-//         <Badge className="text-[10px] w-15 h-6 rounded-sm mr-1" variant={type}>{title}</Badge>
-//     );
-
-//     const isNotStarted = new Date(formItem.started_at) > new Date();
-//     const isExpired = new Date(formItem.expired_at) < new Date();
-//     const isDisabled = formItem.disabled ? formItem.disabled : false;
-//     const isLimited = formItem.limited != 0 && formItem.limited <= formItem.submissions_count;
-
-//     return (
-//         <>
-//             {isNotStarted && showBadge('未开始', 'outline')}
-//             {isExpired && showBadge('已结束')}
-//             {isDisabled && showBadge('已停止', 'destructive')}
-//             {isLimited && showBadge('已完成', 'outline')}
-//         </>
-//     )
-// }
-
 /**
  * 列表单项组件
  * @param formItem 表单遍历的单项数据
@@ -90,11 +76,18 @@ const ActionButtonGroup = ({ formId, onRemoveButton }: {
  * @returns 包含单项数据以及操作按钮的单项组件
  */
 
-const FormItem = ({ formItem, checkedList, onCheckedItem, onRemoveButton }: {
+const FormItem = ({ 
+    formItem, 
+    checkedList, 
+    onCheckedItem, 
+    onRemoveButton, 
+    getShareLinkUrl 
+}: {
     formItem: formItemProps,
-    checkedList: number[],
-    onCheckedItem: (id: number) => void,
-    onRemoveButton: (id: number[]) => void,
+    checkedList: string[],
+    onCheckedItem: (id: string) => void,
+    onRemoveButton: (id: string[]) => void,
+    getShareLinkUrl: (id: string) => string
 }) => {
     return (
         <TableRow>
@@ -134,6 +127,7 @@ const FormItem = ({ formItem, checkedList, onCheckedItem, onRemoveButton }: {
                 <ActionButtonGroup 
                     formId={formItem.id}
                     onRemoveButton={onRemoveButton}
+                    getShareLinkUrl={getShareLinkUrl}
                 />
             </TableCell>
         </TableRow>
@@ -152,7 +146,7 @@ const FormItem = ({ formItem, checkedList, onCheckedItem, onRemoveButton }: {
 interface formListProps {
     displayFields: displayFieldProps[],
     forms: formItemProps[],
-    onRemoveSelected: (ids: number[]) => void,
+    onRemoveSelected: (ids: string[]) => void,
     pagination: paginationProps,
     onSetPage: (page: number) => void,
     onSetPageSize: (pageSize: number) => void,
@@ -170,16 +164,21 @@ export const FormList = ({
 }: formListProps) => {
     
     // 复选框的状态
-    const [checkedList, setCheckedList] = useState<number[]>([]);
+    const [checkedList, setCheckedList] = useState<string[]>([]);
 
     // 处理单选
-    const handleCheckedItem = (id: number) => {
+    const handleCheckedItem = (id: string) => {
         setCheckedList(prev => (
             prev.includes(id)
                 ? prev.filter(item => item !== id)
                 : [...prev, id]
         ))
     }
+
+    // 组合分享链接
+    const getShareLinkUrl = ( id: string ) => {
+        return `${window.location.protocol}//${window.location.hostname}${window.location.port && `:${window.location.port}`}${getConfig().VITE_APP_PREFIX}/v/${id}`;
+    } 
 
     // 处理全选
     const handleCheckedAll = () => {
@@ -202,7 +201,7 @@ export const FormList = ({
     // 移动端操作组
     const simpleFormActions = [
         { label: '编辑', paramName: 'id', onAction: (id: string) => navigate(`/edit/form_id/${id}`) },
-        { label: '删除', paramName: 'id', onAction: (id: string) => confirm('确认删除么？') && onRemoveSelected([Number(id)])},
+        { label: '删除', paramName: 'id', onAction: (id: string) => confirm('确认删除么？') && onRemoveSelected([id])},
         { label: '分享', paramName: 'id', onAction: (id: string) => handleShareLink(id) }
     ];
 
@@ -219,7 +218,7 @@ export const FormList = ({
         setShareDialogState({
             ...shareDialogState,
             isOpen: true,
-            content: (<ShareLinkContent url={`${window.location.protocol}//${window.location.hostname}${window.location.port && `:${window.location.port}`}${import.meta.env.VITE_APP_PREFIX}/v/${id}`} />)
+            content: (<ShareLinkContent url={getShareLinkUrl(id)} />)
         });
         // 清除遮罩
         document.body.style.pointerEvents = "";
@@ -271,7 +270,9 @@ export const FormList = ({
                             formItem={formItem}
                             checkedList={checkedList}
                             onCheckedItem={handleCheckedItem}
-                            onRemoveButton={onRemoveSelected} />
+                            onRemoveButton={onRemoveSelected}
+                            getShareLinkUrl={getShareLinkUrl}
+                        />
                     )) : (
                         <TableRow>
                             <TableCell colSpan={5}>
@@ -413,7 +414,7 @@ const Form = () => {
         { field: 'submissions_count', label: '数据', display: true, sort: true }
     ];
 
-    const handleRemoveSelected = async (ids: number[]) => {
+    const handleRemoveSelected = async (ids: string[]) => {
         if (ids.length === 0) {
             showToast('请选择需要删除的项目。', 2);
             return false;

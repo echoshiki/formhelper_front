@@ -117,7 +117,6 @@ const PageBottom = ({ isLogin, setIsLogin }: {
 }
 
 export default () => {
-
     // 工具类
     const { toast } = useToast();
     const location = useLocation();
@@ -170,7 +169,6 @@ export default () => {
     }, [isLogin]);
 
     const handleSubmit = async () => {
-
         // 提取字段与值 [name]: value
         const fieldValues = Object.fromEntries(
             fields.map(item => [item.name, item.value])

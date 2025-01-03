@@ -2,7 +2,7 @@ import axiosInstance from "@/utils/axiosInstance";
 
 // 导出返回的表单数据项结构类型
 export interface formItemProps {
-    id: number,
+    id: string,
     title: string,
     description: string,
     submissions_count: number,
@@ -91,7 +91,7 @@ class FormService {
      * @description 删除选定表单
      * @param ids 选定表单的 id 集
      */
-    async removeFormSelected(ids: number[]) {
+    async removeFormSelected(ids: string[]) {
         try {
             const { data: { code, msg } } = await axiosInstance.post(
                 `/formhelper/form/deleteSelected`, { 

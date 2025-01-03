@@ -1,11 +1,17 @@
 import axios from "axios"
 import useAuthStore from "@/stores/AuthStore";
+import { getConfig } from "@/config";
 
-const baseUrl = import.meta.env.VITE_API_URL;
 const axiosInstance = axios.create({
-    baseURL: baseUrl,
+    baseURL: getConfig().VITE_API_URL,
     timeout: 10000,
     withCredentials: true
+});
+
+// 动态更新 baseURL
+axiosInstance.interceptors.request.use((config) => {
+    config.baseURL = getConfig().VITE_API_URL; // 动态设置 baseURL
+    return config;
 });
 
 axiosInstance.interceptors.response.use(
