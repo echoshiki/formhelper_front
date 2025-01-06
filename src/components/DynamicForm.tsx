@@ -311,7 +311,7 @@ const FieldsPanel = ({formFields, onRemoveField, onDragEnd, onFieldRequired}: Fi
 											<div className="flex pl-5">
 												<div className="hidden group-hover:flex flex-wrap justify-center">
 													<span className="text-xs">必填</span>
-													<Switch checked={item.required} onCheckedChange={e => onFieldRequired(e, item.id)} />
+													<Switch checked={item.required} onCheckedChange={e => onFieldRequired(e, item.id ? item.id : item.label + key)} />
 												</div>
 												<div className="hidden group-hover:flex flex-wrap justify-center" onClick={() => onRemoveField(key)}>
 													<span className="text-xs">删除</span>
@@ -413,9 +413,9 @@ const DynamicForm = ({ id, onActionForm }: DynamicFormProps) => {
 
 	// 处理字段选择是否必填
 	const handleFieldRequired = (checked: boolean, name: string) => {
-		const nextFormFields = formFields.map(field => (
+		const nextFormFields = formFields.map((field, key) => (
 			//  根据 name 找出需要更改 required 的字段
-			field.id === name ? ({
+			field.id === name || field.label + key == name ? ({
 				...field,
 				required: checked
 			}) : field
