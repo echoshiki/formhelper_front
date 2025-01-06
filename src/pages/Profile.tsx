@@ -90,7 +90,7 @@ const Profile = () => {
 		const updateInfo: updateInfoProps = {
 			nickname: userInfo.nickname,
 			sex: userInfo.sex,
-			birthday: userInfo.birthday,
+			birthday: userInfo.birthday ? userInfo.birthday : null,
 			mobile: userInfo.mobile
 		}
 		const response = await AuthService.updateUser(updateInfo);

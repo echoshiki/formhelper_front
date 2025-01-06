@@ -39,7 +39,7 @@ export interface registerProps {
 export interface updateInfoProps {
     nickname: string,
     sex: string,
-    birthday: string,
+    birthday: string | null,
     mobile: string,
 }
 
