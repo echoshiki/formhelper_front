@@ -179,7 +179,6 @@ const SubmissionList = ({
 }
 
 const Submission = () => {
-
     const { form_id } = useParams();
     const {
         items,

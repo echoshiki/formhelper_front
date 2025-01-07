@@ -122,7 +122,7 @@ const SimpleItem = <T extends Record<string, any>> ({ item, fields, actions }: {
     return (
         <TableRow>
             {fields.map((field, key) => (
-                <TableCell key={key} className="min-w-20 lg:min-w-fit px-0 text-sm lg:text-sm">
+                <TableCell key={key} className={`min-w-20 lg:min-w-fit px-0 text-sm lg:text-sm ${field.type === 'date' ? 'w-20' : ''}`}>
                     {field.type === 'date' ? (
                         <Badge className="font-mono">{itemRender(field)}</Badge>
                     ) : (
@@ -165,14 +165,20 @@ const SimpleList = <T extends Record<string, any>> ({ list, fields, actions }: {
                 </TableRow> */}
             </TableHeader>
             <TableBody>
-                {list.map((item, key) => (
+                {list.length ? list.map((item, key) => (
                     <SimpleItem<T> 
                         key={key}
                         item={item} 
                         fields={fields}
                         actions={actions}
                     />
-                ))}
+                )) : (
+                    <TableRow>
+                        <TableCell colSpan={fields.length + 1} className="text-center">
+                            暂无数据
+                        </TableCell>
+                    </TableRow>
+                )}
             </TableBody>
         </Table> 
     )

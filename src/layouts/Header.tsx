@@ -48,12 +48,12 @@ export default function Header({ title }: { title: string }) {
                         <DrawerContent>
                             <DrawerHeader className="flex justify-between items-center">
                                 <div className="">
-                                    <p className="text-xl font-bold text-left">{currentUser?.username}</p>
-                                    <p className="text-xs text-gray-500">{currentUser?.email}</p>
+                                    <p className="text-2xl font-bold text-left">{currentUser?.username}</p>
+                                    <p className="text-sm text-gray-500 text-left">普通会员</p>
                                 </div>
                                 <div className="">
                                     {currentUser?.avatar && (
-                                        <img src={currentUser.avatar} className="w-10 h-10 rounded-full" />
+                                        <img src={currentUser.avatar} className="w-12 h-12 rounded-full" />
                                     )}
                                 </div>
                             </DrawerHeader>

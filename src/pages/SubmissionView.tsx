@@ -79,24 +79,27 @@ const SubmissionView = () => {
                                                 <p className="w-full lg:w-auto flex items-center"><UserRound size="15"/>&nbsp;&nbsp;{submissionData?.username}</p>
                                                 <p className="w-full flex items-center"><Clock size="15" />&nbsp;&nbsp;{submissionData?.submitted_at}</p>                                                
                                             </div>
-                                            <IsSure
-                                                title="确认删除么？"
-                                                description="数据删除之后无法恢复，再次确认，是否需要删除？"
-                                                onConfirm={handleRemoveSelected}
-                                            >
-                                                <Button
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    className="flex space-x-1 h-8 text-xs" >
-                                                    <Trash2 size="12" />
-                                                    <span>删除</span>
-                                                </Button>
-                                            </IsSure>
+                                            
                                         </div>
                                     </TableCell>
                                 </TableRow>
                             </TableFooter>
                         </Table>
+                        <div className="mt-5">
+                            <IsSure
+                                title="确认删除么？"
+                                description="数据删除之后无法恢复，再次确认，是否需要删除？"
+                                onConfirm={handleRemoveSelected}
+                            >
+                                <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    className="flex space-x-1 h-8 text-xs" >
+                                    <Trash2 size="12" />
+                                    <span>删除</span>
+                                </Button>
+                            </IsSure>
+                        </div>
                     </CardContent>
                 </Card>
             </> 

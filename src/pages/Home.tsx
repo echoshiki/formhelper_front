@@ -21,13 +21,13 @@ const CountCard = ({ title, count, Icon }: {
     return (
         <Card className="w-1/3 mt-2 text-center lg:text-left" x-chunk="dashboard-01-chunk-0">
             <CardHeader className="flex lg:flex-row items-center justify-between space-y-0 pt-5 pb-2">
-                <CardTitle className="text-xs lg:text-sm font-normal text-gray-500">
+                <CardTitle className="text-sm lg:text-sm font-normal text-gray-500">
                     {title}
                 </CardTitle>
                 <Icon size="24" className="hidden lg:block" />
             </CardHeader>
             <CardContent className="pb-5">
-                <div className="text-2xl font-bold">{count}</div>
+                <div className="text-3xl font-bold">{count}</div>
             </CardContent>
         </Card>
     )
@@ -111,7 +111,7 @@ const Home = () => {
 
                 <Card className="w-full lg:w-2/5 mt-2" x-chunk="dashboard-01-chunk-0">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pt-5 pb-2">
-                        <CardTitle className="text-xs lg:text-sm font-normal text-gray-500">
+                        <CardTitle className="text-sm lg:text-sm font-normal text-gray-500">
                             可用剩余
                         </CardTitle>
                         <Flower size="24" className="w-4 h-4 lg:w-6 lg:h-6" />
@@ -130,7 +130,7 @@ const Home = () => {
                             <h1 className="font-semibold text-lg">最新数据</h1>
                         </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pb-2">
                         <SimpleList 
                             list={recentSubmissions}
                             fields={recentSubmissionFields}
@@ -143,7 +143,7 @@ const Home = () => {
                             <h1 className="font-semibold text-lg">最近表单</h1>
                         </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pb-2">
                         <SimpleList 
                             list={recentForms}
                             fields={recentFormFields}
